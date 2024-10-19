@@ -4,24 +4,34 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Timer;
 
-public class HomeScreen implements Screen {
-    private SpriteBatch batch;
-    private Texture backgroundTexture; // Image for the background
+public class LoadingScreen implements Screen {
+    private final SpriteBatch batch;
+    private final Texture backgroundTexture;
+    private MainLauncher game;
 
-    public HomeScreen() {
+    public LoadingScreen(MainLauncher game) {
+        this.game = game;
         batch = new SpriteBatch();
-        backgroundTexture = new Texture("background.jpg"); // Load bg image
+        backgroundTexture = new Texture("background.png");
+
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                game.setScreen(new LoginScreen(game));
+            }
+        }, 2);
     }
 
     @Override
     public void show() {
-        // This method is called when the screen becomes active
+
     }
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.5f, 0.8f, 0.9f, 1); // Light Blue background color
+        Gdx.gl.glClearColor(0.5f, 0.8f, 0.9f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
@@ -31,22 +41,21 @@ public class HomeScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        // Handle window resizing if needed
     }
 
     @Override
     public void pause() {
-        // Handle pause state if needed
+
     }
 
     @Override
     public void resume() {
-        // Handle resume state if needed
+
     }
 
     @Override
     public void hide() {
-        // Called when the screen is no longer active
+
     }
 
     @Override
