@@ -11,7 +11,7 @@ public class HomeScreen implements Screen {
 
     public HomeScreen() {
         batch = new SpriteBatch();
-        backgroundTexture = new Texture("background.jpg"); // Load bg image
+        backgroundTexture = new Texture("background.png"); // Load bg image
     }
 
     @Override
