@@ -9,9 +9,9 @@ public class LoadedGame implements Screen {
     private SpriteBatch batch;
     private Texture bgtexture; // Image for the background
 
-    public LoadedGame() {
+    public LoadedGame(MainLauncher game) {
         batch = new SpriteBatch();
-        bgtexture = new Texture("Loaded Game_bg.png"); // Load bg image
+        bgtexture = new Texture("loadedgame_bg.png"); // Load bg image
     }
 
     @Override

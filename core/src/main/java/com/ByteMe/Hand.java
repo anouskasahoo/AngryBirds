@@ -6,17 +6,21 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class Levels implements Screen {
+import static com.ByteMe.MainLauncher.levelsBg;
+
+public class Hand implements Screen {
     private SpriteBatch batch;
     private Texture bgtexture;
     private Texture backButton;
     private Texture playButton;
     private MainLauncher game;
+    private int level;
 
-    public Levels(MainLauncher game) {
+    public Hand(MainLauncher game, int level) {
         this.game=game;
+        this.level=level;
         batch = new SpriteBatch();
-        bgtexture = new Texture("Level_bg.png");
+        bgtexture = new Texture(levelsBg.get(level));
         backButton = new Texture("backbutton.png");
         playButton = new Texture("PlayButton.png");
     }
