@@ -2,8 +2,8 @@ package com.ByteMe;
 
 public class KingPig extends Pig{
     public KingPig() {
-        super("ClassicPig.png", 15);
-        size.add(65);
-        size.add(75);
+        super("KingPig.png", 15);
+        size.add(70);
+        size.add(80);
     }
 }

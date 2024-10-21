@@ -11,6 +11,7 @@ public abstract class Level {
     protected final Texture pauseButton;
     protected final Slingshot slingshot;
     protected ArrayList<Bird> birds;
+    protected ArrayList<Pig> pigs;
     public int pauseButton_x = 720;
     public int pauseButton_y = 420;
     public int pauseButton_w = 75;

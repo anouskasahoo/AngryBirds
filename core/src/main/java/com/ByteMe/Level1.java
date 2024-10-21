@@ -39,23 +39,23 @@ public class Level1 extends Level implements Screen {
         //Initialize pigs
         pigs = new ArrayList<>();
         ClassicPig cp1 = new ClassicPig();
-        cp1.position.add(90);
-        cp1.position.add(160);
+        cp1.position.add(615);
+        cp1.position.add(70);
         pigs.add(cp1);
 
         ClassicPig cp2 = new ClassicPig();
-        cp2.position.add(50);
-        cp2.position.add(70);
+        cp2.position.add(540);
+        cp2.position.add(140);
         pigs.add(cp2);
 
         KingPig kp1 = new KingPig();
-        kp1.position.add(200);
-        kp1.position.add(70);
+        kp1.position.add(680);
+        kp1.position.add(280);
         pigs.add(kp1);
 
         PrettyPig pp1 = new PrettyPig();
-        pp1.position.add(0);
-        pp1.position.add(70);
+        pp1.position.add(680);
+        pp1.position.add(140);
         pigs.add(pp1);
     }
 
@@ -78,6 +78,8 @@ public class Level1 extends Level implements Screen {
         for (Pig pig : pigs) {
             batch.draw(pig.texture, pig.position.get(0), pig.position.get(1), pig.size.get(0), pig.size.get(1));
         }
+
+        batch.draw(pauseButton, pauseButton_x, pauseButton_y, pauseButton_w, pauseButton_h);
 
         batch.draw(slingshot2, slingshot.position.get(0) - 5, slingshot.position.get(1), slingshot.size.get(0), slingshot.size.get(1));
         batch.end();
