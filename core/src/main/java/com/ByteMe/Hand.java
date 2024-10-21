@@ -51,6 +51,16 @@ public class Hand implements Screen {
             if (mouseX >= back_x && mouseX <= back_x+back_width && mouseY >= back_y && mouseY <= back_y+back_height) {
                 game.setScreen(new HomeScreen(game));
             }
+            if (mouseX >= play_x && mouseX <= play_x+play_width && mouseY >= play_y && mouseY <= play_y+play_height) {
+                switch(level) {
+                    case 1:
+                        game.setScreen(new Level1(game));
+                        break;
+                    case 2:
+                        //game.setScreen(new Level2(game));
+                        break;
+                }
+            }
         }
 
         batch.begin();
