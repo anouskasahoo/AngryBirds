@@ -59,7 +59,7 @@ public class HomeScreen implements Screen {
             if (mouseX >= exit_x && mouseX <= exit_x+exit_width && mouseY >= exit_y && mouseY <= exit_y+exit_height) {
                 Gdx.app.exit();
             }
-            if (mouseX >= load_x && mouseX <= load_y+load_width && mouseY >= load_y && mouseY <= load_y+load_height) {
+            if (mouseX >= load_x && mouseX <= load_x+load_width && mouseY >= load_y && mouseY <= load_y+load_height) {
                 game.setScreen(new LoadedGame(game));
             }
             if (mouseX >= board_x && mouseX <= board_x+board_width && mouseY >= board_y && mouseY <= board_y+board_height) {
