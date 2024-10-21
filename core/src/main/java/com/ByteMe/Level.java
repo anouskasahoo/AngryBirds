@@ -12,6 +12,7 @@ public abstract class Level {
     protected final Slingshot slingshot;
     protected ArrayList<Bird> birds;
     protected ArrayList<Pig> pigs;
+    protected ArrayList<Obstacle> obstacles;
     public int pauseButton_x = 720;
     public int pauseButton_y = 420;
     public int pauseButton_w = 75;
@@ -27,6 +28,7 @@ public abstract class Level {
         this.slingshot = new Slingshot(t,p1,p2,s1,s2);
         this.birds = new ArrayList<>();
         this.pauseButton = new Texture("pausebutton.png");
+        this.obstacles = new ArrayList<>();
     }
 
     public void dispose() {

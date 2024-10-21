@@ -6,13 +6,14 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 
 public class Level1 extends Level implements Screen {
 
-    private Texture slingshot2;
-    private Texture backgroundTexture;
+    private final Texture slingshot2;
+    private final Texture backgroundTexture;
 
     public Level1(MainLauncher game) {
         super(game,"slingshot1.png",100,70,50,150);
@@ -40,24 +41,36 @@ public class Level1 extends Level implements Screen {
         //Initialize pigs
         pigs = new ArrayList<>();
         ClassicPig cp1 = new ClassicPig();
-        cp1.position.add(615);
+        cp1.position.add(677);
         cp1.position.add(70);
         pigs.add(cp1);
 
         ClassicPig cp2 = new ClassicPig();
-        cp2.position.add(540);
-        cp2.position.add(140);
+        cp2.position.add(628);
+        cp2.position.add(115);
         pigs.add(cp2);
 
         KingPig kp1 = new KingPig();
-        kp1.position.add(680);
-        kp1.position.add(280);
+        kp1.position.add(720);
+        kp1.position.add(205);
         pigs.add(kp1);
 
         PrettyPig pp1 = new PrettyPig();
-        pp1.position.add(680);
-        pp1.position.add(140);
+        pp1.position.add(720);
+        pp1.position.add(110);
         pigs.add(pp1);
+
+        obstacles.add(new Wood(new Vector2(585, 110), Wood.Orientation.HORIZONTAL));
+        obstacles.add(new Wood(new Vector2(580, 70), Wood.Orientation.VERTICAL));
+        obstacles.add(new TNT(new Vector2(720, 70)));
+        obstacles.add(new TNT(new Vector2(630, 70)));
+        obstacles.add(new TNT(new Vector2(580, 115)));
+        obstacles.add(new TNT(new Vector2(720, 160)));
+        obstacles.add(new Wood(new Vector2(625, 155), Wood.Orientation.HORIZONTAL));
+        obstacles.add(new Wood(new Vector2(670, 115), Wood.Orientation.VERTICAL));
+        obstacles.add(new Stone(new Vector2(672, 115), Wood.Orientation.HORIZONTAL));
+        obstacles.add(new Stone(new Vector2(720, 115), Wood.Orientation.VERTICAL));
+        obstacles.add(new Stone(new Vector2(760, 115), Wood.Orientation.VERTICAL));
     }
 
     @Override
@@ -86,12 +99,15 @@ public class Level1 extends Level implements Screen {
             batch.draw(bird.texture, bird.position.get(0), bird.position.get(1), bird.size.get(0), bird.size.get(1));
         }
 
+        for (Obstacle obstacle : obstacles) {
+            obstacle.render(batch);
+        }
+
         for (Pig pig : pigs) {
             batch.draw(pig.texture, pig.position.get(0), pig.position.get(1), pig.size.get(0), pig.size.get(1));
         }
 
         batch.draw(pauseButton, pauseButton_x, pauseButton_y, pauseButton_w, pauseButton_h);
-
         batch.draw(slingshot2, slingshot.position.get(0) - 5, slingshot.position.get(1), slingshot.size.get(0), slingshot.size.get(1));
         batch.end();
     }
@@ -114,13 +130,13 @@ public class Level1 extends Level implements Screen {
 
     @Override
     public void dispose() {
-        super.dispose(); // Dispose from the parent class if necessary
+        super.dispose();
         batch.dispose();
         slingshot2.dispose();
         backgroundTexture.dispose();
         for (Bird bird : birds) {
             if (bird.texture != null) {
-                bird.texture.dispose(); // Dispose each bird's texture
+                bird.texture.dispose();
             }
         }
     }
