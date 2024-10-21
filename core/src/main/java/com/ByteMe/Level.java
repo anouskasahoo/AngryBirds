@@ -8,8 +8,14 @@ import java.util.ArrayList;
 public abstract class Level {
     protected final MainLauncher game;
     protected final SpriteBatch batch;
+    protected Texture pauseButton = null;
     protected final Slingshot slingshot;
     protected ArrayList<Bird> birds;
+    public int pauseButton_x = 720;
+    public int pauseButton_y = 420;
+    public int pauseButton_w = 75;
+    public int pauseButton_h = 50;
+    protected ArrayList<Pig> pigs;
 
     // Background texture and slingshot2 are now protected to allow access in derived classes
     protected Texture backgroundTexture;
@@ -17,6 +23,7 @@ public abstract class Level {
 
     public Level(MainLauncher game) {
         this.game = game;
+        this.pauseButton = pauseButton;
         this.batch = new SpriteBatch();
         this.slingshot = new Slingshot("slingshot1.png");
         this.birds = new ArrayList<>();
@@ -37,4 +44,5 @@ public abstract class Level {
             }
         }
     }
+
 }
