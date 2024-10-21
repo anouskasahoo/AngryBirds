@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class LoginScreen implements Screen {
-    private final Game game;
+    private final MainLauncher game;
     private final SpriteBatch batch;
     private final Texture backgroundTexture;
     private final Texture exitButton;
