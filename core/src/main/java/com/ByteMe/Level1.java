@@ -1,0 +1,86 @@
+package com.ByteMe;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
+import java.util.ArrayList;
+
+public class Level1 extends Level implements Screen {
+
+    private Texture slingshot2;
+    private Texture backgroundTexture;
+
+    public Level1(MainLauncher game) {
+        super(game);
+        slingshot2 = new Texture("slingshot2.png");
+        backgroundTexture = new Texture("newlevel_bg.png");
+
+        // Initialize birds
+        birds = new ArrayList<>();
+        Bombird b1 = new Bombird();
+        b1.position.add(90);
+        b1.position.add(160);
+        birds.add(b1);
+
+        TeleBird b2 = new TeleBird();
+        b2.position.add(50);
+        b2.position.add(70);
+        birds.add(b2);
+
+        ClassicBird b3 = new ClassicBird();
+        b3.position.add(0);
+        b3.position.add(70);
+        birds.add(b3);
+    }
+
+    @Override
+    public void show() {
+    }
+
+    @Override
+    public void render(float delta) {
+        Gdx.gl.glClearColor(0.5f, 0.8f, 0.9f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        batch.begin();
+        batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.draw(slingshot.texture, slingshot.position.get(0), slingshot.position.get(1), slingshot.size.get(0), slingshot.size.get(1));
+        for (Bird bird : birds) {
+            batch.draw(bird.texture, bird.position.get(0), bird.position.get(1), bird.size.get(0), bird.size.get(1));
+        }
+        batch.draw(slingshot2, slingshot.position.get(0) - 5, slingshot.position.get(1), slingshot.size.get(0), slingshot.size.get(1));
+        batch.end();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+    }
+
+    @Override
+    public void pause() {
+    }
+
+    @Override
+    public void resume() {
+    }
+
+    @Override
+    public void hide() {
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose(); // Dispose from the parent class if necessary
+        batch.dispose();
+        slingshot2.dispose();
+        backgroundTexture.dispose();
+        for (Bird bird : birds) {
+            if (bird.texture != null) {
+                bird.texture.dispose(); // Dispose each bird's texture
+            }
+        }
+    }
+}
