@@ -21,10 +21,10 @@ public abstract class Level {
     protected Texture backgroundTexture;
     protected Texture slingshot2;
 
-    public Level(MainLauncher game) {
+    public Level(MainLauncher game, String t, int p1, int p2, int s1, int s2) {
         this.game = game;
         this.batch = new SpriteBatch();
-        this.slingshot = new Slingshot("slingshot1.png");
+        this.slingshot = new Slingshot(t,p1,p2,s1,s2);
         this.birds = new ArrayList<>();
         this.pauseButton = new Texture("pausebutton.png");
     }

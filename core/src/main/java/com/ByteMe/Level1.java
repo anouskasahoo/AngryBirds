@@ -14,7 +14,7 @@ public class Level1 extends Level implements Screen {
     private Texture backgroundTexture;
 
     public Level1(MainLauncher game) {
-        super(game);
+        super(game,"slingshot1.png",100,70,50,150);
         slingshot2 = new Texture("slingshot2.png");
         backgroundTexture = new Texture("newlevel_bg.png");
 
