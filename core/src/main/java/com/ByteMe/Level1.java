@@ -18,7 +18,7 @@ public class Level1 extends Level implements Screen {
     public Level1(MainLauncher game) {
         super(game,"slingshot1.png",100,70,50,150);
         slingshot2 = new Texture("slingshot2.png");
-        backgroundTexture = new Texture("newlevel_bg.png");
+        backgroundTexture = new Texture("level1_bg.png");
 
         // Initialize birds
         birds = new ArrayList<>();
@@ -68,9 +68,9 @@ public class Level1 extends Level implements Screen {
         obstacles.add(new TNT(new Vector2(720, 160)));
         obstacles.add(new Wood(new Vector2(625, 155), Wood.Orientation.HORIZONTAL));
         obstacles.add(new Wood(new Vector2(670, 115), Wood.Orientation.VERTICAL));
-        obstacles.add(new Stone(new Vector2(672, 115), Wood.Orientation.HORIZONTAL));
-        obstacles.add(new Stone(new Vector2(720, 115), Wood.Orientation.VERTICAL));
-        obstacles.add(new Stone(new Vector2(760, 115), Wood.Orientation.VERTICAL));
+        obstacles.add(new Stone(new Vector2(672, 115), Stone.Orientation.HORIZONTAL));
+        obstacles.add(new Stone(new Vector2(720, 115), Stone.Orientation.VERTICAL));
+        obstacles.add(new Stone(new Vector2(760, 115), Stone.Orientation.VERTICAL));
     }
 
     @Override
@@ -87,7 +87,7 @@ public class Level1 extends Level implements Screen {
             float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             if (mouseX >= pauseButton_x && mouseX <= pauseButton_x+pauseButton_w && mouseY >= pauseButton_y && mouseY <= pauseButton_y+pauseButton_h){
-                game.setScreen(new PauseGame(game,'N'));
+                game.setScreen(new PauseGame(game,1));
             }
 
         }

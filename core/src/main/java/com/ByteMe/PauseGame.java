@@ -15,17 +15,13 @@ public class PauseGame implements Screen {
     private Texture endButton;
     private Texture saveButton;
     private MainLauncher game;
-    private Boolean loaded;
+    private int status;
 
-    public PauseGame(MainLauncher game, Character c) {
+    public PauseGame(MainLauncher game, int i) {
         this.game=game;
         batch = new SpriteBatch();
-        loaded = (c=='L');
-        if (loaded){
-            bgtexture = new Texture("loadedpause_bg.png");
-        } else {
-            bgtexture = new Texture("newpause_bg.png");
-        }
+        status = i;
+        bgtexture = new Texture("pause_bg.png");
         resumeButton = new Texture("resume_button.png");
         endButton = new Texture("endgame_button.png");
         saveButton = new Texture("savegame_button.png");
@@ -59,10 +55,19 @@ public class PauseGame implements Screen {
             float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             if (mouseX >= resume_x && mouseX <= resume_x+resume_width && mouseY >= resume_y && mouseY <= resume_y+resume_height) {
-                if (loaded) {
-                    game.setScreen(new LoadedGame(game));
-                }else{
-                    game.setScreen(new Level1(game));
+                switch (status){
+                    case 0:
+                        game.setScreen(new LoadedGame(game));
+                        break;
+                    case 1:
+                        game.setScreen(new Level1(game));
+                        break;
+                    case 2:
+                        game.setScreen(new Level2(game));
+                        break;
+                    case 3:
+                        //game.setScreen(new Level3(game));
+                        break;
                 }
             }
             if ((mouseX >= save_x && mouseX <= save_x+save_width && mouseY >= save_y && mouseY <= save_y+save_height)||(mouseX >= end_x && mouseX <= end_x+end_width && mouseY >= end_y && mouseY <= end_y+end_height)) {
