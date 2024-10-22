@@ -1,6 +1,5 @@
 package com.ByteMe.lwjgl3;
 
-import com.ByteMe.LoginScreen;
 import com.ByteMe.MainLauncher;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
