@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import static com.ByteMe.MainLauncher.levelsBg;
 
-public class Hand implements Screen {
+public class HandScreen implements Screen {
     private SpriteBatch batch;
     private Texture bgtexture;
     private Texture backButton;
@@ -16,7 +16,7 @@ public class Hand implements Screen {
     private MainLauncher game;
     private int level;
 
-    public Hand(MainLauncher game, int level) {
+    public HandScreen(MainLauncher game, int level) {
         this.game=game;
         this.level=level;
         batch = new SpriteBatch();
@@ -49,7 +49,7 @@ public class Hand implements Screen {
             float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             if (mouseX >= back_x && mouseX <= back_x+back_width && mouseY >= back_y && mouseY <= back_y+back_height) {
-                game.setScreen(new HomeScreen(game));
+                game.setScreen(new LevelsScreen(game));
             }
             if (mouseX >= play_x && mouseX <= play_x+play_width && mouseY >= play_y && mouseY <= play_y+play_height) {
                 switch(level) {

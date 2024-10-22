@@ -6,12 +6,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
-import java.awt.*;
 
 public class LoginScreen implements Screen {
     private final MainLauncher game;
@@ -48,6 +42,9 @@ public class LoginScreen implements Screen {
             }
 
             if (mouseX >= 325 && mouseX <= 325+150 && mouseY >= 50 && mouseY <= 50+60){
+                //PLAY BUTTON FUNCTIONALITY
+                //store name, error or same screen if null
+                Player player = new Player();
                 game.setScreen(new HomeScreen(game));
             }
 

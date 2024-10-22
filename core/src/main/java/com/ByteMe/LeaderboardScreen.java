@@ -1,19 +1,18 @@
 package com.ByteMe;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class Leaderboard implements Screen {
+public class LeaderboardScreen implements Screen {
     private SpriteBatch batch;
     private Texture bgtexture;
     private Texture backButton;
     private MainLauncher game;
 
-    public Leaderboard(MainLauncher game) {
+    public LeaderboardScreen(MainLauncher game) {
         this.game=game;
         batch = new SpriteBatch();
         bgtexture = new Texture("Leaderboard_bg.png");

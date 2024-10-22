@@ -63,10 +63,10 @@ public class HomeScreen implements Screen {
                 game.setScreen(new LoadedGame(game));
             }
             if (mouseX >= board_x && mouseX <= board_x+board_width && mouseY >= board_y && mouseY <= board_y+board_height) {
-                game.setScreen(new Leaderboard(game));
+                game.setScreen(new LeaderboardScreen(game));
             }
             if (mouseX >= play_x && mouseX <= play_x+play_width && mouseY >= play_y && mouseY <= play_y+play_height) {
-                game.setScreen(new Hand(game,1));
+                game.setScreen(new LevelsScreen (game));
             }
 
         }
@@ -102,7 +102,7 @@ public class HomeScreen implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
-        backgroundTexture.dispose(); // Clean up resources
+        backgroundTexture.dispose();
     }
 }
 

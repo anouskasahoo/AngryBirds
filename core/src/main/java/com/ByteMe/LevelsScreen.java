@@ -1,0 +1,113 @@
+package com.ByteMe;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
+public class LevelsScreen implements Screen {
+    private final SpriteBatch batch;
+    private final Texture backgroundTexture;
+    private MainLauncher game;
+    private final Texture Level1;
+    private final Texture Level2;
+    private final Texture Level3;
+    private final Texture backButton;
+
+
+    public LevelsScreen (MainLauncher game) {
+        this.game = game;
+        batch = new SpriteBatch();
+        backgroundTexture = new Texture("levels_bg.png");
+        Level1 = new Texture("Level1.png");
+        Level2 = new Texture("Level2.png");
+        Level3 = new Texture("Level3.png");
+        backButton = new Texture("backbutton.png");
+
+    }
+
+    @Override
+    public void show() {
+
+    }
+
+    @Override
+    public void render(float delta) {
+        Gdx.gl.glClearColor(0.5f, 0.8f, 0.9f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        int level1_x = 278;
+        int level1_y = 50;
+        int level1_w = 65;
+        int level1_h = 375;
+
+        int level2_x = 361;
+        int level2_y = 45;
+        int level2_w = 60;
+        int level2_h = 380;
+
+        int level3_x = 443;
+        int level3_y = 50;
+        int level3_w = 60;
+        int level3_h = 375;
+
+        int back_x = 10;
+        int back_y = 400;
+        int back_width = 80;
+        int back_height = 50;
+
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            float mouseX = Gdx.input.getX();
+            float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
+
+            if (mouseX >= level1_x && mouseX <= level1_x+level1_w&& mouseY >= level1_y && mouseY <= level1_y+level1_h) {
+                game.setScreen(new HandScreen(game,1));
+            }
+            if (mouseX >= level2_x && mouseX <= level2_x+level2_w&& mouseY >= level2_y && mouseY <= level2_y+level2_h) {
+                game.setScreen(new HandScreen(game,2));
+            }
+            if (mouseX >= level3_x && mouseX <= level3_x+level3_w&& mouseY >= level3_y && mouseY <= level3_y+level3_h) {
+                game.setScreen(new HandScreen(game,3));
+            }
+            if (mouseX >= back_x && mouseX <= back_x+back_width && mouseY >= back_y && mouseY <= back_y+back_height) {
+                game.setScreen(new HomeScreen(game));
+            }
+
+        }
+
+        batch.begin();
+        batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.draw(Level1, 278, 50, 65, 375);
+        batch.draw(Level2, 361, 45, 60, 380);
+        batch.draw(Level3, 443, 50, 60, 375);
+        batch.draw(backButton, back_x, back_y, back_width, back_height);
+        batch.end();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
+    @Override
+    public void dispose() {
+        batch.dispose();
+        backgroundTexture.dispose(); // Clean up resources
+    }
+}
