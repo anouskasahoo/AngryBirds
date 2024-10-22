@@ -6,11 +6,12 @@ public class Wood extends Obstacle {
     public enum Orientation {
         HORIZONTAL,
         VERTICAL,
-        DIAGONAL
+        DIAGONAL,
+        BOX
     }
 
     public Wood(Vector2 position, Orientation orientation) {
-        super(orientation == Orientation.HORIZONTAL ? "wood_horizontal.png" : (orientation == Orientation.VERTICAL ? "wood_vertical.png" : "wood_diagonal.png"),
+        super(orientation == Orientation.HORIZONTAL ? "wood_horizontal.png" : (orientation == Orientation.VERTICAL ? "wood_vertical.png" : (orientation == Orientation.DIAGONAL ? "wood_diagonal.png" : "wood_box.png")),
             position,
             orientation == Orientation.VERTICAL ? 10 : 50,
             orientation == Orientation.HORIZONTAL ? 10 : 50);
