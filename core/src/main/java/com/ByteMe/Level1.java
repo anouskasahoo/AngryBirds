@@ -18,7 +18,7 @@ public class Level1 extends Level implements Screen {
     public Level1(MainLauncher game) {
         super(game,"slingshot1.png",100,70,50,150);
         slingshot2 = new Texture("slingshot2.png");
-        backgroundTexture = new Texture("level1_bg.png");
+        backgroundTexture = new Texture("Level1_bg.png");
 
         // Initialize birds
         birds = new ArrayList<>();

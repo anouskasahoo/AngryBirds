@@ -14,12 +14,12 @@ public class MainLauncher extends Game {
     static ArrayList<Player> players;
 
     static {
-        levelsBg.put(1, "Level1_bg.png");
-        levelsBg.put(2, "Level2_bg.png");
-        levelsBg.put(3, "Level3_bg.png");
-        levelsBg.put(4, "level4_bg.png");
-        levelsBg.put(5, "level5_bg.png");
-        levelsBg.put(6, "level6_bg.png");
+        levelsBg.put(1, "Hand1.png");
+        levelsBg.put(2, "Hand2.png");
+        levelsBg.put(3, "Hand3.png");
+        levelsBg.put(4, "Hand4.png");
+        levelsBg.put(5, "Hand5.png");
+        levelsBg.put(6, "Hand6.png");
     }
 
     @Override
