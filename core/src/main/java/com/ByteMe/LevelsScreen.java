@@ -15,10 +15,12 @@ public class LevelsScreen implements Screen {
     private final Texture Level2;
     private final Texture Level3;
     private final Texture backButton;
+    private final Player player;
 
 
-    public LevelsScreen (MainLauncher game) {
+    public LevelsScreen (MainLauncher game, Player player) {
         this.game = game;
+        this.player = player;
         batch = new SpriteBatch();
         backgroundTexture = new Texture("levels_bg.png");
         Level1 = new Texture("Level1.png");
@@ -63,16 +65,16 @@ public class LevelsScreen implements Screen {
             float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             if (mouseX >= level1_x && mouseX <= level1_x+level1_w&& mouseY >= level1_y && mouseY <= level1_y+level1_h) {
-                game.setScreen(new HandScreen(game,1));
+                game.setScreen(new HandScreen(game,1, player));
             }
             if (mouseX >= level2_x && mouseX <= level2_x+level2_w&& mouseY >= level2_y && mouseY <= level2_y+level2_h) {
-                game.setScreen(new HandScreen(game,2));
+                game.setScreen(new HandScreen(game,2, player));
             }
             if (mouseX >= level3_x && mouseX <= level3_x+level3_w&& mouseY >= level3_y && mouseY <= level3_y+level3_h) {
-                game.setScreen(new HandScreen(game,3));
+                game.setScreen(new HandScreen(game,3, player));
             }
             if (mouseX >= back_x && mouseX <= back_x+back_width && mouseY >= back_y && mouseY <= back_y+back_height) {
-                game.setScreen(new HomeScreen(game));
+                game.setScreen(new HomeScreen(game, player));
             }
 
         }

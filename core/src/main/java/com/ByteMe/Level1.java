@@ -14,11 +14,15 @@ public class Level1 extends Level implements Screen {
 
     private final Texture slingshot2;
     private final Texture backgroundTexture;
+    private final Player player;
+    private final MainLauncher game;
 
-    public Level1(MainLauncher game) {
+    public Level1(MainLauncher game, Player player) {
         super(game,"slingshot1.png",100,70,50,150);
         slingshot2 = new Texture("slingshot2.png");
         backgroundTexture = new Texture("Level1_bg.png");
+        this.player = player;
+        this.game = game;
 
         // Initialize birds
         birds = new ArrayList<>();
@@ -87,7 +91,7 @@ public class Level1 extends Level implements Screen {
             float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             if (mouseX >= pauseButton_x && mouseX <= pauseButton_x+pauseButton_w && mouseY >= pauseButton_y && mouseY <= pauseButton_y+pauseButton_h){
-                game.setScreen(new PauseGame(game,1));
+                game.setScreen(new PauseGame(game,1, player));
             }
 
         }
