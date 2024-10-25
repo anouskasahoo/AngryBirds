@@ -6,6 +6,10 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class LoginScreen implements Screen {
     private final MainLauncher game;
@@ -13,6 +17,12 @@ public class LoginScreen implements Screen {
     private final Texture backgroundTexture;
     private final Texture exitButton;
     private final Texture playButton;
+    Player player;
+    private Stage stage;
+    private TextField playerNameField;
+    private Skin skin;
+    private String playerName = "";
+
 
     public LoginScreen(MainLauncher game) {
         this.game = game;
@@ -20,6 +30,23 @@ public class LoginScreen implements Screen {
         backgroundTexture = new Texture("login.png");
         exitButton = new Texture("ExitButton.png");
         playButton = new Texture("PlayButton.png");
+        this.player = new Player();
+
+        // Create a stage and a skin for UI components
+        stage = new Stage(new ScreenViewport());
+        skin = new Skin(Gdx.files.internal("uiskin.json"));
+
+        // Create a TextField for player name input
+        playerNameField = new TextField("", skin);
+        playerNameField.setPosition(210, 125); // Adjust position as per your UI layout
+        playerNameField.setSize(200, 40);      // Adjust size
+        playerNameField.setMessageText("Enter your name"); // Placeholder text
+
+        // Add the TextField to the stage
+        stage.addActor(playerNameField);
+
+        // Set input processor to stage for UI interaction
+        Gdx.input.setInputProcessor(stage);
 
     }
 
@@ -42,10 +69,8 @@ public class LoginScreen implements Screen {
             }
 
             if (mouseX >= 325 && mouseX <= 325+150 && mouseY >= 50 && mouseY <= 50+60){
-                //PLAY BUTTON FUNCTIONALITY
-                //store name, error or same screen if null
-                Player player = new Player();
-                game.setScreen(new HomeScreen(game));
+                player.setName(playerNameField.getText());
+                game.setScreen(new HomeScreen(game, player));
             }
 
         }
@@ -55,10 +80,14 @@ public class LoginScreen implements Screen {
         batch.draw(exitButton, 15, 15, 80, 30);
         batch.draw(playButton, 325, 50, 150, 60);
         batch.end();
+
+        stage.act(delta);
+        stage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
+        stage.getViewport().update(width, height, true);
     }
 
     @Override
@@ -82,5 +111,7 @@ public class LoginScreen implements Screen {
         backgroundTexture.dispose();
         exitButton.dispose();
         playButton.dispose();
+        stage.dispose();
+        skin.dispose();
     }
 }

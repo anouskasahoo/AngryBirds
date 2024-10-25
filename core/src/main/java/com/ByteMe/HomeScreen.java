@@ -10,13 +10,15 @@ public class HomeScreen implements Screen {
     private final SpriteBatch batch;
     private final Texture backgroundTexture;
     private MainLauncher game;
+    private final Player player;
     private final Texture exitButton;
     private final Texture loadButton;
     private final Texture boardButton;
     private final Texture playButton;
 
-    public HomeScreen(MainLauncher game) {
+    public HomeScreen(MainLauncher game, Player player) {
         this.game = game;
+        this.player = player;
         batch = new SpriteBatch();
         backgroundTexture = new Texture("Home_bg.png");
         exitButton = new Texture("home_exitbutton.png");
@@ -60,13 +62,13 @@ public class HomeScreen implements Screen {
                 Gdx.app.exit();
             }
             if (mouseX >= load_x && mouseX <= load_x+load_width && mouseY >= load_y && mouseY <= load_y+load_height) {
-                game.setScreen(new LoadedGame(game));
+                game.setScreen(new LoadedGame(game, player));
             }
             if (mouseX >= board_x && mouseX <= board_x+board_width && mouseY >= board_y && mouseY <= board_y+board_height) {
-                game.setScreen(new LeaderboardScreen(game));
+                game.setScreen(new LeaderboardScreen(game, player));
             }
             if (mouseX >= play_x && mouseX <= play_x+play_width && mouseY >= play_y && mouseY <= play_y+play_height) {
-                game.setScreen(new LevelsScreen (game));
+                game.setScreen(new LevelsScreen (game, player));
             }
 
         }

@@ -15,9 +15,11 @@ public class HandScreen implements Screen {
     private Texture playButton;
     private MainLauncher game;
     private int level;
+    private final Player player;
 
-    public HandScreen(MainLauncher game, int level) {
+    public HandScreen(MainLauncher game, int level, Player player) {
         this.game=game;
+        this.player = player;
         this.level=level;
         batch = new SpriteBatch();
         bgtexture = new Texture(levelsBg.get(level));
@@ -49,18 +51,18 @@ public class HandScreen implements Screen {
             float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             if (mouseX >= back_x && mouseX <= back_x+back_width && mouseY >= back_y && mouseY <= back_y+back_height) {
-                game.setScreen(new LevelsScreen(game));
+                game.setScreen(new LevelsScreen(game, player));
             }
             if (mouseX >= play_x && mouseX <= play_x+play_width && mouseY >= play_y && mouseY <= play_y+play_height) {
                 switch(level) {
                     case 1:
-                        game.setScreen(new Level1(game));
+                        game.setScreen(new Level1(game, player));
                         break;
                     case 2:
-                        game.setScreen(new Level2(game));
+                        game.setScreen(new Level2(game, player));
                         break;
                     case 3:
-                        game.setScreen(new Level3(game));
+                        //game.setScreen(new Level3(game, player));
                         break;
                 }
             }

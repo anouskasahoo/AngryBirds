@@ -7,16 +7,21 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.sun.tools.javac.Main;
 
 import java.util.ArrayList;
 
 public class LoadedGame extends Level implements Screen {
-    private Texture bgtexture; // Image for the background
+    private Texture bgtexture;// Image for the background
+    private final Player player;
+    private final MainLauncher game;
 
-    public LoadedGame(MainLauncher game) {
+    public LoadedGame(MainLauncher game, Player player) {
         super(game,"pulled_slingshot.png",90,70,250,150);
         slingshot2 = new Texture("pulled_slingshot1.png");
         bgtexture = new Texture("loadedgame_bg.png");
+        this.game = game;
+        this.player = player;
 
         // Initialize birds
         birds = new ArrayList<>();
@@ -79,7 +84,7 @@ public class LoadedGame extends Level implements Screen {
             float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             if (mouseX >= pauseButton_x && mouseX <= pauseButton_x+pauseButton_w && mouseY >= pauseButton_y && mouseY <= pauseButton_y+pauseButton_h){
-                game.setScreen(new PauseGame(game,0));
+                game.setScreen(new PauseGame(game,0, player));
             }
 
         }

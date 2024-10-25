@@ -11,9 +11,11 @@ public class LeaderboardScreen implements Screen {
     private Texture bgtexture;
     private Texture backButton;
     private MainLauncher game;
+    private final Player player;
 
-    public LeaderboardScreen(MainLauncher game) {
+    public LeaderboardScreen(MainLauncher game, Player player) {
         this.game=game;
+        this.player = player;
         batch = new SpriteBatch();
         bgtexture = new Texture("Leaderboard_bg.png");
         backButton = new Texture("backbutton.png");
@@ -38,7 +40,7 @@ public class LeaderboardScreen implements Screen {
             float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             if (mouseX >= back_x && mouseX <= back_x+back_width && mouseY >= back_y && mouseY <= back_y+back_height) {
-                game.setScreen(new HomeScreen(game));
+                game.setScreen(new HomeScreen(game, player));
             }
         }
 
