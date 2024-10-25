@@ -31,7 +31,8 @@ public class MainLauncher extends Game {
         backgroundMusic.setLooping(true);
         backgroundMusic.play();
         setScreen(new LoadingScreen(this));
-        //setScreen(new Level3(this));
+//        Player player = new Player();
+//        setScreen(new Win(this, player));
     }
 
     @Override

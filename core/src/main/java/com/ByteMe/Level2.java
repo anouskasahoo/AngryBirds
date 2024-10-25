@@ -101,6 +101,12 @@ public class Level2 extends Level implements Screen {
             if (mouseX >= pauseButton_x && mouseX <= pauseButton_x+pauseButton_w && mouseY >= pauseButton_y && mouseY <= pauseButton_y+pauseButton_h){
                 game.setScreen(new PauseGame(game,2, player));
             }
+            if (mouseX >= winButton_x && mouseX <= winButton_x+winButton_w && mouseY >= winButton_y && mouseY <= winButton_y+winButton_h){
+                game.setScreen(new Win(game, player));
+            }
+            if (mouseX >= lossButton_x && mouseX <= lossButton_x+lossButton_w && mouseY >= lossButton_y && mouseY <= lossButton_y+lossButton_h){
+                game.setScreen(new Loss(game,2, player));
+            }
 
         }
 

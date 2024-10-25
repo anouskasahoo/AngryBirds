@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class Win implements Screen {
+public class Loss implements Screen {
 
     private SpriteBatch batch;
     private Texture bgtexture;
@@ -15,13 +15,15 @@ public class Win implements Screen {
     private Texture endButton;
     private MainLauncher game;
     private final Player player;
+    private int status;
 
-    public Win(MainLauncher game, Player player) {
+    public Loss(MainLauncher game, int i, Player player) {
         this.game=game;
         this.player = player;
+        status=i;
         batch = new SpriteBatch();
-        bgtexture = new Texture("win_bg.png");
-        nextButton = new Texture("next_wl.png");
+        bgtexture = new Texture("loss_bg.png");
+        nextButton = new Texture("restart_wl.png");
         endButton = new Texture("exit_wl.png");
     }
 
@@ -35,10 +37,10 @@ public class Win implements Screen {
         Gdx.gl.glClearColor(0.5f, 0.8f, 0.9f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        int next_x = 225;
-        int next_y = 200;
-        int next_width = 350;
-        int next_height = 70;
+        int restart_x = 225;
+        int restart_y = 200;
+        int restart_width = 350;
+        int restart_height = 70;
         int end_x = 225;
         int end_y = 130;
         int end_width = 350;
@@ -48,8 +50,18 @@ public class Win implements Screen {
             float mouseX = Gdx.input.getX();
             float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
-            if (mouseX >= next_x && mouseX <= next_x+next_width && mouseY >= next_y && mouseY <= next_y+next_height) {
-                game.setScreen(new LevelsScreen(game, player));
+            if (mouseX >= restart_x && mouseX <= restart_x+restart_width && mouseY >= restart_y && mouseY <= restart_y+restart_height) {
+                switch (status){
+                    case 1:
+                        game.setScreen(new Level1(game, player));
+                        break;
+                    case 2:
+                        game.setScreen(new Level2(game, player));
+                        break;
+                    case 3:
+                        game.setScreen(new Level3(game, player));
+                        break;
+                }
             }
             if (mouseX >= end_x && mouseX <= end_x+end_width && mouseY >= end_y && mouseY <= end_y+end_height) {
                 game.setScreen(new HomeScreen(game, player));
@@ -59,7 +71,7 @@ public class Win implements Screen {
 
         batch.begin();
         batch.draw(bgtexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.draw(nextButton, next_x, next_y, next_width, next_height);
+        batch.draw(nextButton, restart_x, restart_y, restart_width, restart_height);
         batch.draw(endButton, end_x, end_y, end_width, end_height);
         batch.end();
     }
