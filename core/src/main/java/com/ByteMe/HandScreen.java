@@ -57,7 +57,10 @@ public class HandScreen implements Screen {
                         game.setScreen(new Level1(game));
                         break;
                     case 2:
-                        //game.setScreen(new Level2(game));
+                        game.setScreen(new Level2(game));
+                        break;
+                    case 3:
+                        game.setScreen(new Level3(game));
                         break;
                 }
             }
