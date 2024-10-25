@@ -38,7 +38,7 @@ public class LoginScreen implements Screen {
 
         // Create a TextField for player name input
         playerNameField = new TextField("", skin);
-        playerNameField.setPosition(210, 125); // Adjust position as per your UI layout
+        playerNameField.setPosition(210, 122); // Adjust position as per your UI layout
         playerNameField.setSize(200, 40);      // Adjust size
         playerNameField.setMessageText("Enter your name"); // Placeholder text
 
