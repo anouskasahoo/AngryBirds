@@ -100,7 +100,7 @@ public class Level3 extends Level implements Screen {
             float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             if (mouseX >= pauseButton_x && mouseX <= pauseButton_x+pauseButton_w && mouseY >= pauseButton_y && mouseY <= pauseButton_y+pauseButton_h){
-                game.setScreen(new PauseGame(game,2));
+                game.setScreen(new PauseGame(game,2, new Player()));
             }
 
         }
