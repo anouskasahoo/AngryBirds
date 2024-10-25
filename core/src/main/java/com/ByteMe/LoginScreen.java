@@ -1,5 +1,4 @@
 package com.ByteMe;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -32,20 +31,14 @@ public class LoginScreen implements Screen {
         playButton = new Texture("PlayButton.png");
         this.player = new Player();
 
-        // Create a stage and a skin for UI components
         stage = new Stage(new ScreenViewport());
         skin = new Skin(Gdx.files.internal("uiskin.json"));
-
-        // Create a TextField for player name input
         playerNameField = new TextField("", skin);
-        playerNameField.setPosition(210, 122); // Adjust position as per your UI layout
-        playerNameField.setSize(200, 40);      // Adjust size
-        playerNameField.setMessageText("Enter your name"); // Placeholder text
-
-        // Add the TextField to the stage
+        playerNameField.setPosition(210, 122);
+        playerNameField.setSize(200, 40);
+        playerNameField.setMessageText("Enter your name");
         stage.addActor(playerNameField);
 
-        // Set input processor to stage for UI interaction
         Gdx.input.setInputProcessor(stage);
 
     }
@@ -80,7 +73,6 @@ public class LoginScreen implements Screen {
         batch.draw(exitButton, 15, 15, 80, 30);
         batch.draw(playButton, 325, 50, 150, 60);
         batch.end();
-
         stage.act(delta);
         stage.draw();
     }
