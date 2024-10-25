@@ -68,7 +68,7 @@ public class PauseGame implements Screen {
                         game.setScreen(new Level2(game, player));
                         break;
                     case 3:
-                        //game.setScreen(new Level3(game));
+                        game.setScreen(new Level3(game, player));
                         break;
                 }
             }

@@ -93,6 +93,9 @@ public class Level1 extends Level implements Screen {
             if (mouseX >= pauseButton_x && mouseX <= pauseButton_x+pauseButton_w && mouseY >= pauseButton_y && mouseY <= pauseButton_y+pauseButton_h){
                 game.setScreen(new PauseGame(game,1, player));
             }
+            if (mouseX >= winButton_h && mouseX <= winButton_x+winButton_w && mouseY >= winButton_y && mouseY <= winButton_y+winButton_h){
+                game.setScreen(new Win(game, player));
+            }
 
         }
 
@@ -112,6 +115,8 @@ public class Level1 extends Level implements Screen {
         }
 
         batch.draw(pauseButton, pauseButton_x, pauseButton_y, pauseButton_w, pauseButton_h);
+        batch.draw(winButton, winButton_x, winButton_y, winButton_w, winButton_h);
+        batch.draw(lossButton, lossButton_x, lossButton_y, lossButton_w, lossButton_h);
         batch.draw(slingshot2, slingshot.position.get(0) - 5, slingshot.position.get(1), slingshot.size.get(0), slingshot.size.get(1));
         batch.end();
     }

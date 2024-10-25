@@ -105,7 +105,8 @@ public class LoadedGame extends Level implements Screen {
         }
 
         batch.draw(pauseButton, pauseButton_x, pauseButton_y, pauseButton_w, pauseButton_h);
-
+        batch.draw(winButton, winButton_x, winButton_y, winButton_w, winButton_h);
+        batch.draw(lossButton, lossButton_x, lossButton_y, lossButton_w, lossButton_h);
         batch.draw(slingshot2, slingshot.position.get(0), slingshot.position.get(1), slingshot.size.get(0), slingshot.size.get(1));
         batch.end();
     }
