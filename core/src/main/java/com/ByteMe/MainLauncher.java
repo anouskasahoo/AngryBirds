@@ -3,6 +3,7 @@ package com.ByteMe;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +13,8 @@ public class MainLauncher extends Game {
     static Map<Integer, String> levelsBg = new HashMap<>();
     static ArrayList<Level> levels;
     static ArrayList<Player> players;
+    private Music backgroundMusic;
+
 
     static {
         levelsBg.put(1, "Hand1.png");
@@ -24,7 +27,17 @@ public class MainLauncher extends Game {
 
     @Override
     public void create() {
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("bg_music.mp3"));
+        backgroundMusic.setLooping(true);
+        backgroundMusic.play();
         setScreen(new LoadingScreen(this));
         //setScreen(new LevelsScreen(this));
     }
+
+    @Override
+    public void dispose() {
+        backgroundMusic.dispose();
+        super.dispose();
+    }
+
 }

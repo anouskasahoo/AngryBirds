@@ -72,8 +72,11 @@ public class PauseGame implements Screen {
                         break;
                 }
             }
-            if ((mouseX >= save_x && mouseX <= save_x+save_width && mouseY >= save_y && mouseY <= save_y+save_height)||(mouseX >= end_x && mouseX <= end_x+end_width && mouseY >= end_y && mouseY <= end_y+end_height)) {
+            if (mouseX >= save_x && mouseX <= save_x+save_width && mouseY >= save_y && mouseY <= save_y+save_height) {
                 game.setScreen(new LevelsScreen(game, player));
+            }
+            if (mouseX >= end_x && mouseX <= end_x+end_width && mouseY >= end_y && mouseY <= end_y+end_height) {
+                game.setScreen(new HomeScreen(game, player));
             }
 
         }
