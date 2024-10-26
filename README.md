@@ -26,8 +26,8 @@ The project also follows **Factory Design Pattern**, which helps manage the crea
 
 1. **Clone the Repository from GitHub:**
    ```bash
-   git clone https://github.com/your-repo-link/angry-birds-project.git
-   cd angry-birds-project
+    git clone https://github.com/vaiiishhh/AngryBirds.git
+    cd AngryBirds
    ```
 
 2. **Import the Project in IntelliJ or any other IDEs**
@@ -37,6 +37,13 @@ The project also follows **Factory Design Pattern**, which helps manage the crea
 
 4. **Run the Game:**
     - Run `Lwjgl3Launcher` located in `com/ByteMe/lwjgl3/Lwjgl3Launcher.java`.
+
+5. **Running in Terminal (Optional):**
+    - Navigate to the project directory:
+      ```bash
+      cd core/
+      ./gradlew run
+      ```
 
 ---
 
@@ -48,18 +55,18 @@ The project also follows **Factory Design Pattern**, which helps manage the crea
 2. #### **Home Screen:**
     After entering your name, you are taken to the **Home Screen**, which contains four buttons:
    - **New Game**: Starts a new game and leads to the level selection screen.
-   - **Load Saved Games**: This button is present for future functionality to load previously saved games.
+   - **Load Saved Games**: This button is present for future functionality to load previously saved games, current it take you to a static screen.
    - **Leaderboard**: Displays the leaderboard.
    - **Exit**: Ends the game.
 
 3. #### **Level Selection Screen:**
-    Clicking on the **New Game** button from the home screen takes you to the **Level Selection Screen**, where you can choose between **Level 1**, **Level 2**, and **Level 3**. Each button will theoretically start the corresponding level.
+    Clicking on the **New Game** button from the home screen takes you to the **Level Selection Screen**, where you can choose between **Level 1**, **Level 2**, and **Level 3**.
 
-4. #### **In-Game Options (Per Level):**
+4. #### **In-Game Options:**
     Each level has a few options represented by buttons:
    - **Pause Game**: Pauses the game.
    - **Resume**: Resumes the game after pausing.
-   - **Exit**: Exits the level and returns to the home screen.
+   - **Exit**: Exits the level.
    - **Save Game**: A placeholder button to save the current progress (functionality yet to be implemented).
 
 *Note: The current version is purely a Static GUI, so no game logic or dynamic interactions have been added yet.*
