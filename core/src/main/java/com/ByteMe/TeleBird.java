@@ -5,5 +5,6 @@ public class TeleBird extends Bird{
         super("teleBird.png");
         size.add(70);
         size.add(75);
+        damage = 2;
     }
 }

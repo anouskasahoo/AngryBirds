@@ -10,9 +10,13 @@ public class Stone extends Obstacle{
     }
 
     public Stone(Vector2 position, Orientation orientation) {
-        super(orientation == Stone.Orientation.HORIZONTAL ? "stone_horizontal.png" : (orientation == Stone.Orientation.VERTICAL ? "stone_vertical.png" : "stone_hbox.png"),
+        super(
+            orientation == Orientation.HORIZONTAL ? "stone_horizontal.png" :
+                (orientation == Orientation.VERTICAL ? "stone_vertical.png" : "stone_hbox.png"),
             position,
-            orientation == Stone.Orientation.HORIZONTAL ? 50 : (orientation == Stone.Orientation.VERTICAL ? 10 : 100),
-            orientation == Stone.Orientation.HORIZONTAL ? 10 : 50);
+            orientation == Orientation.HORIZONTAL ? 50 : (orientation == Orientation.VERTICAL ? 10 : 100),
+            orientation == Orientation.HORIZONTAL ? 10 : 50,
+            6 // 6 health
+        );
     }
 }
