@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
-public abstract class Obstacle {
+public abstract class Obstacle{
     protected Texture texture;
     protected Vector2 position;
     protected float width, height;

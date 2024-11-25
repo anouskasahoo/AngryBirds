@@ -13,6 +13,8 @@ public abstract class Bird {
     boolean isFlying;
     public ArrayList<Vector2> trajectoryPoints;
     public int damage;
+    public float launchVelocityX;
+    public float launchVelocityY;
 
     public Bird(String t) {
         texture = new Texture(t);
@@ -26,6 +28,11 @@ public abstract class Bird {
 
     public void setPosition(int screenX, int screenY) {
         position.set(screenX, screenY);
+    }
+
+    public void launch() {
+        isFlying = true;
+        velocity.set(launchVelocityX, launchVelocityY);
     }
 
 }

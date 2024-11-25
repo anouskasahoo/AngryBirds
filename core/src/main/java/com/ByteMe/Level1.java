@@ -4,16 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 
 public class Level1 extends Level implements Screen , InputProcessor {
@@ -22,31 +19,21 @@ public class Level1 extends Level implements Screen , InputProcessor {
     private final Texture backgroundTexture;
     private final Player player;
     private final MainLauncher game;
-    private boolean isDragging = false; // Tracks if the bird is being dragged
     private Vector2 initialPosition;   // Stores the initial position of the first bird
     private ShapeRenderer shapeRenderer;
-    private Vector2 initialSlingshotPosition;
     private Vector2 dragStartPosition;
-    private final Texture bandTexture;
-    private final Vector2 anchorBack;  // Behind the bird
-    private final Vector2 anchorFront;// In front of the bird
-    private boolean explosionActive = false; // To track if an explosion is active
-    private float explosionDuration = 1f; // Duration for which the explosion is visible
-    private float explosionTimer = 0f; // Timer to track how long the explosion has been active
-    Texture explosionTexture = new Texture("blast.png");
+    private Vector2 initialSlingshotPosition;
+    private Set<Vector2> occupiedPositions;
 
 
     public Level1(MainLauncher game, Player player) {
-        super(game,"slingshot1.png",100,70,50,150);
+        super(game, "slingshot1.png", 100, 70, 50, 150, player);
         slingshot2 = new Texture("slingshot2.png");
         backgroundTexture = new Texture("Level1_bg.png");
         this.player = player;
         this.game = game;
         shapeRenderer = new ShapeRenderer();
-        initialSlingshotPosition = new Vector2(slingshot.position.get(0), slingshot.position.get(1));
-        bandTexture = new Texture("band.png");
-        anchorBack = new Vector2(slingshot.position.get(0) + 20, slingshot.position.get(1) + 130);
-        anchorFront = new Vector2(slingshot.position.get(0) + 55, slingshot.position.get(1) + 130);
+        this.initialSlingshotPosition = new Vector2(slingshot.position.get(0), slingshot.position.get(1));
 
 
         // Initialize birds
@@ -67,23 +54,19 @@ public class Level1 extends Level implements Screen , InputProcessor {
         //Initialize pigs
         pigs = new ArrayList<>();
         ClassicPig cp1 = new ClassicPig();
-        cp1.position.add(677);
-        cp1.position.add(70);
+        cp1.position.set(677, 70);
         pigs.add(cp1);
 
         ClassicPig cp2 = new ClassicPig();
-        cp2.position.add(628);
-        cp2.position.add(115);
+        cp2.position.set(628, 115);
         pigs.add(cp2);
 
         KingPig kp1 = new KingPig();
-        kp1.position.add(720);
-        kp1.position.add(205);
+        kp1.position.set(720, 205);
         pigs.add(kp1);
 
         PrettyPig pp1 = new PrettyPig();
-        pp1.position.add(720);
-        pp1.position.add(110);
+        pp1.position.set(720, 110);
         pigs.add(pp1);
 
         obstacles.add(new Wood(new Vector2(585, 110), Wood.Orientation.HORIZONTAL));
@@ -107,324 +90,16 @@ public class Level1 extends Level implements Screen , InputProcessor {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.5f, 0.8f, 0.9f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
+        clearScreen();
         batch.begin();
-
-        // Handle mouse clicks for UI (pause, win, loss)
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-            float mouseX = Gdx.input.getX();
-            float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
-
-            if (mouseX >= pauseButton_x && mouseX <= pauseButton_x + pauseButton_w &&
-                mouseY >= pauseButton_y && mouseY <= pauseButton_y + pauseButton_h) {
-                game.setScreen(new PauseGame(game, 1, player));
-            }
-            if (mouseX >= winButton_x && mouseX <= winButton_x + winButton_w &&
-                mouseY >= winButton_y && mouseY <= winButton_y + winButton_h) {
-                game.setScreen(new Win(game, player));
-            }
-            if (mouseX >= lossButton_x && mouseX <= lossButton_x + lossButton_w &&
-                mouseY >= lossButton_y && mouseY <= lossButton_y + lossButton_h) {
-                game.setScreen(new Loss(game, 1, player));
-            }
-        }
-
-        // Draw background
-        batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
-        for (Bird bird : birds) {
-            if (bird instanceof Bombird && ((Bombird) bird).hasExploded) {
-                // Draw blast texture if Bombird has exploded
-                batch.draw(((Bombird) bird).blastTexture, bird.position.x, bird.position.y, bird.size.get(0), bird.size.get(1));
-            } else {
-                // Draw normal bird texture
-                batch.draw(bird.texture, bird.position.x, bird.position.y, bird.size.get(0), bird.size.get(1));
-            }
-        }
-
-        // Draw obstacles and pigs after birds
-        for (Obstacle obstacle : obstacles) {
-            if (obstacle instanceof TNT && ((TNT) obstacle).hasExploded) {
-                // Draw blast texture for TNT if it has exploded
-                batch.draw(((TNT) obstacle).blastTexture, obstacle.position.x, obstacle.position.y, obstacle.width, obstacle.height);
-            } else {
-                obstacle.render(batch); // Render normally if not exploded
-            }
-        }
-
-        // Draw elastic bands (before birds and slingshot)
-        if (isDragging) {
-            Bird firstBird = birds.get(0);
-
-            // Bird's current position
-            float birdX = firstBird.position.x;
-            float birdY = firstBird.position.y;
-
-            // Draw the back band
-            float angleBack = MathUtils.atan2(birdY - anchorBack.y, birdX - anchorBack.x) * MathUtils.radiansToDegrees;
-            float lengthBack = Vector2.dst(anchorBack.x, anchorBack.y, birdX, birdY);
-
-            batch.draw(
-                bandTexture,
-                anchorBack.x, anchorBack.y, // Position
-                0, 0, // Origin
-                lengthBack, 10, // Width (stretch) and height (thickness)
-                1, 1, // Scale
-                angleBack, // Rotation angle
-                0, 0,  // Texture region start
-                bandTexture.getWidth(), bandTexture.getHeight(),
-                false, false  // Flip X/Y
-            );
-
-            // Draw the front band
-            float angleFront = MathUtils.atan2(birdY - anchorFront.y, birdX - anchorFront.x) * MathUtils.radiansToDegrees;
-            float lengthFront = Vector2.dst(anchorFront.x, anchorFront.y, birdX, birdY);
-
-            batch.draw(
-                bandTexture,
-                anchorFront.x, anchorFront.y,
-                0, 0,
-                lengthFront, 10,
-                1, 1,
-                angleFront,
-                0, 0,
-                bandTexture.getWidth(), bandTexture.getHeight(),
-                false, false
-            );
-        }
-
-        // Draw slingshot
-        batch.draw(slingshot.texture, slingshot.position.get(0), slingshot.position.get(1), slingshot.size.get(0), slingshot.size.get(1));
-
-        // Draw birds
-        for (Bird bird : birds) {
-            batch.draw(bird.texture, bird.position.x, bird.position.y, bird.size.get(0), bird.size.get(1));
-        }
-
-        // Draw obstacles and pigs after birds
-        for (Obstacle obstacle : obstacles) {
-            obstacle.render(batch);
-        }
-
-        // Draw pigs
-        for (Pig pig : pigs) {
-            batch.draw(pig.texture, pig.position.get(0), pig.position.get(1), pig.size.get(0), pig.size.get(1));
-        }
-
-        // Draw UI buttons (pause, win, loss)
-        batch.draw(pauseButton, pauseButton_x, pauseButton_y, pauseButton_w, pauseButton_h);
-        batch.draw(winButton, winButton_x, winButton_y, winButton_w, winButton_h);
-        batch.draw(lossButton, lossButton_x, lossButton_y, lossButton_w, lossButton_h);
-
-        // Draw the secondary slingshot overlay (slingshot2)
-        batch.draw(slingshot2, slingshot.position.get(0) - 5, slingshot.position.get(1), slingshot.size.get(0), slingshot.size.get(1));
-
+        drawGameElements();
         batch.end();
-
-        if (isDragging) {
-            Gdx.gl.glLineWidth(15);
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Point);
-            shapeRenderer.setColor(Color.WHITE);
-
-            // Initial position and other parameters
-            Vector2 start = new Vector2(birds.get(0).position.x, birds.get(0).position.y);
-
-            // Constants for trajectory
-            float v0 = 620f; // Increased initial speed to go farther along x-axis
-            float angle = 30f; // A smaller angle for a flatter trajectory (adjust as needed)
-            float gravity = -400f; // Gravity, tweak for gameplay feel
-
-            // Convert angle to radians for calculation
-            float theta = MathUtils.degreesToRadians * angle;
-
-            // Calculate the initial velocity components
-            float v0x = v0 * MathUtils.cos(theta); // horizontal velocity component
-            float v0y = v0 * MathUtils.sin(theta); // vertical velocity component
-
-            // Calculate trajectory points
-            float maxPoints = 10;
-            for (int i = 1; i <= maxPoints; i++) {
-                float t = i / (float) maxPoints;  // time step
-
-                // Calculate x and y position at time t
-                float x = start.x + v0x * t;
-                float y = start.y + v0y * t + 0.5f * gravity * t * t; // Gravity affects y motion
-
-                // Draw trajectory points
-                shapeRenderer.point(x, y, 0);
-            }
-
-            if (!Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                Bird firstBird = birds.get(0);
-                firstBird.velocity.set(v0x, v0y); // Set the bird's velocity based on the drag
-                firstBird.isFlying = true; // Start flying
-                isDragging = false; // Stop dragging
-            }
-
-            shapeRenderer.end();
-            Gdx.gl.glLineWidth(1);
-        }
-
-        for (Bird bird : birds) {
-            if (bird.isFlying && bird.trajectoryPoints != null && !bird.trajectoryPoints.isEmpty()) {
-                // Smoothly interpolate between trajectory points
-                Vector2 currentPoint = bird.trajectoryPoints.get(0);
-                float moveSpeed = 25f; // Adjust for smoother movement
-
-                bird.position.x = MathUtils.lerp(bird.position.x, currentPoint.x, moveSpeed * Gdx.graphics.getDeltaTime());
-                bird.position.y = MathUtils.lerp(bird.position.y, currentPoint.y, moveSpeed * Gdx.graphics.getDeltaTime());
-
-                // Remove point when close enough
-                if (Vector2.dst(bird.position.x, bird.position.y, currentPoint.x, currentPoint.y) < 10f) {
-                    bird.trajectoryPoints.remove(0);
-                }
-
-                if (bird.position.y <= 60) {
-                    bird.isFlying = false;
-                    birds.remove(bird);
-                    break;
-                }
-
-                // Stop flying if no more points
-                if (bird.trajectoryPoints.isEmpty()) {
-                    bird.isFlying = false;
-                }
-            }
-        }
-
-        // Create safe copies of collections
-        List<Bird> activeBirds = new ArrayList<>(birds);
-        List<Pig> activePigs = new ArrayList<>(pigs);
-        List<Obstacle> activeObstacles = new ArrayList<>(obstacles);
-
-        // Tracking lists for removal
-        List<Bird> birdsToRemove = new ArrayList<>();
-        List<Pig> pigsToRemove = new ArrayList<>();
-        List<Obstacle> obstaclesToRemove = new ArrayList<>();
-
-        // Process flying birds using an iterator for safe removal
-        Iterator<Bird> birdIterator = activeBirds.iterator();
-        while (birdIterator.hasNext()) {
-            Bird bird = birdIterator.next();
-            if (bird != null && bird.isFlying) {
-                // Check collisions with pigs
-                for (Pig pig : activePigs) {
-                    handleCollision(bird, pig);
-                    if (pig.isDestroyed) {
-                        pigsToRemove.add(pig);
-                    }
-                }
-                // Check collisions with obstacles
-                for (Obstacle obstacle : activeObstacles) {
-                    handleCollision(bird, obstacle);
-                    if (obstacle.isDestroyed) {
-                        obstaclesToRemove.add(obstacle);
-                    }
-                }
-
-                // Mark bird for removal if not flying
-                if (!bird.isFlying) {
-                    birdsToRemove.add(bird);
-                }
-            }
-            if (explosionActive) {
-                batch.begin();
-                batch.draw(explosionTexture, Gdx.graphics.getWidth() / 2 - explosionTexture.getWidth() / 2,
-                    Gdx.graphics.getHeight() / 2 - explosionTexture.getHeight() / 2);
-                batch.end();
-
-                // Update timer for how long the explosion has been active
-                explosionTimer += delta;
-                if (explosionTimer >= explosionDuration) {
-                    explosionActive = false; // Reset after duration
-                }
-            }
-        }
-
-        // Safe removal of destroyed/inactive entities using iterators
-        birds.removeAll(birdsToRemove);
-
-        Iterator<Pig> pigIterator = pigs.iterator();
-        while (pigIterator.hasNext()) {
-            Pig pig = pigIterator.next();
-            if (pigsToRemove.contains(pig)) {
-                pigIterator.remove(); // Safely remove using iterator
-            }
-        }
-
-        Iterator<Obstacle> obstacleIterator = obstacles.iterator();
-        while (obstacleIterator.hasNext()) {
-            Obstacle obstacle = obstacleIterator.next();
-            if (obstaclesToRemove.contains(obstacle)) {
-                obstacleIterator.remove(); // Safely remove using iterator
-            }
-        }
-
-    }
-    private boolean checkCollision(Bird bird, Pig pig) {
-        return bird.position.x < pig.position.get(0) + pig.size.get(0) &&
-            bird.position.x + bird.size.get(0) > pig.position.get(0) &&
-            bird.position.y < pig.position.get(1) + pig.size.get(1) &&
-            bird.position.y + bird.size.get(1) > pig.position.get(1);
-    }
-
-    private boolean checkCollision(Bird bird, Obstacle obstacle) {
-        return bird.position.x < obstacle.position.x + obstacle.width &&
-            bird.position.x + bird.size.get(0) > obstacle.position.x &&
-            bird.position.y < obstacle.position.y + obstacle.height &&
-            bird.position.y + bird.size.get(1) > obstacle.position.y;
-    }
-
-    private void handleCollision(Bird bird, Pig pig) {
-        if (checkCollision(bird, pig)) {
-            pig.takeDamage(bird.damage);
-            bird.isFlying = false;
-
-            if (bird instanceof Bombird) {
-                Bombird bombird = (Bombird) bird;
-                bombird.hasExploded = true;
-                explosionActive = true;
-                explosionTimer = 0f;
-                for (Pig p : pigs) {
-                    if (Vector2.dst(bird.position.x, bird.position.y, p.position.get(0), p.position.get(1)) <= 100) {
-                        p.takeDamage(3);
-                    }
-                }
-                for (Obstacle o : obstacles) {
-                    if (Vector2.dst(bird.position.x, bird.position.y, o.position.x, o.position.y) <= 100) {
-                        o.takeDamage(3);
-                    }
-                }
-            }
-        }
-    }
-
-    private void handleCollision(Bird bird, Obstacle obstacle) {
-        if (checkCollision(bird, obstacle)) {
-            obstacle.takeDamage(bird.damage);
-            bird.isFlying = false;
-
-            // TNT explosion logic
-            if (obstacle instanceof TNT) {
-                TNT tnt = (TNT) obstacle;
-                tnt.hasExploded = true;
-                explosionActive = true;
-                explosionTimer = 0f;
-                for (Pig p : pigs) {
-                    if (Vector2.dst(obstacle.position.x, obstacle.position.y, p.position.get(0), p.position.get(1)) <= 100) {
-                        p.takeDamage(3);
-                    }
-                }
-                for (Obstacle o : obstacles) {
-                    if (o != tnt && Vector2.dst(obstacle.position.x, obstacle.position.y, o.position.x, o.position.y) <= 100) {
-                        o.takeDamage(3);
-                    }
-                }
-
-            }
-        }
+        initializeOccupiedPositions();
+        handleInput();
+        updateBirdTrajectory();
+        updateFlyingBirds(delta);
+        handleCollisions();
+        checkGameConditions();
     }
 
     @Override
@@ -459,62 +134,13 @@ public class Level1 extends Level implements Screen , InputProcessor {
         return false;
     }
 
-
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (isDragging) {
-            screenY = Gdx.graphics.getHeight() - screenY; // Convert to game coordinates
-
-            Bird firstBird = birds.get(0);
-
-            // Constants for trajectory calculation
-            float v0 = 620f; // Initial velocity
-            float angle = 30f; // Launch angle
-            float gravity = -400f; // Gravity constant
-
-            float theta = MathUtils.degreesToRadians * angle;
-
-            // Calculate velocity components based on drag position
-            float dragDistance = Vector2.dst(initialSlingshotPosition.x, initialSlingshotPosition.y, screenX, screenY);
-            float normalizedDistance = MathUtils.clamp(dragDistance / 100f, 0f, 1f); // Normalize drag distance
-
-            float v0x = v0 * MathUtils.cos(theta) * normalizedDistance; // Horizontal velocity
-            float v0y = v0 * MathUtils.sin(theta) * normalizedDistance; // Vertical velocity
-
-            // Store trajectory points for the bird to follow
-            firstBird.trajectoryPoints = calculateTrajectoryPoints(
-                firstBird.position.x,
-                firstBird.position.y,
-                v0x,
-                v0y,
-                gravity
-            );
-
-            // Set bird's velocity and flying state
-            firstBird.velocity.set(v0x, v0y);
-            firstBird.isFlying = true;
-            isDragging = false;
-
-            return true;
+        if (isDragging){
+            updateFlyingBirds();
+            handleBirdRelease();
         }
-        return false;
-    }
-
-    private ArrayList<Vector2> calculateTrajectoryPoints(float startX, float startY, float v0x, float v0y, float gravity) {
-        ArrayList<Vector2> points = new ArrayList<>();
-        float maxTime = 2f;  // Total flight time
-        float maxPoints = 10;  // Match the number of points in trajectory drawing
-
-        for (int i = 1; i <= maxPoints; i++) {
-            float t = i / maxPoints * maxTime;  // Evenly distributed time points
-
-            // Calculate x and y position at time t (exactly matching trajectory drawing logic)
-            float x = startX + v0x * t;
-            float y = startY + v0y * t + 0.5f * gravity * t * t;
-            points.add(new Vector2(x, y));
-        }
-
-        return points;
+        return true;
     }
 
     @Override
@@ -576,5 +202,603 @@ public class Level1 extends Level implements Screen , InputProcessor {
         }
         shapeRenderer.dispose();
         bandTexture.dispose();
+    }
+
+    private boolean checkCollision(Bird bird, Pig pig) {
+        return bird.position.x < pig.position.x + pig.size.get(0) &&
+            bird.position.x + bird.size.get(0) > pig.position.x &&
+            bird.position.y < pig.position.y + pig.size.get(1) &&
+            bird.position.y + bird.size.get(1) > pig.position.y;
+    }
+
+    private boolean checkCollision(Bird bird, Obstacle obstacle) {
+        return bird.position.x < obstacle.position.x + obstacle.width &&
+            bird.position.x + bird.size.get(0) > obstacle.position.x &&
+            bird.position.y < obstacle.position.y + obstacle.height &&
+            bird.position.y + bird.size.get(1) > obstacle.position.y;
+    }
+
+    private void applyGravityDamage(float destroyedX, float destroyedY) {
+        for (Pig pig : pigs) {
+            if (isAbove(pig.position.x, pig.position.y, destroyedX, destroyedY)) {
+                pig.takeDamage(1);
+                pig.position.set(destroyedX, destroyedY);
+                applyGravityEffect(pig.position, 70, occupiedPositions);
+            }
+        }
+
+        for (Obstacle obstacle : obstacles) {
+            if (isAbove(obstacle.position.x, obstacle.position.y, destroyedX, destroyedY)) {
+                obstacle.takeDamage(1);
+                obstacle.position.set(destroyedX, destroyedY);
+            }
+        }
+    }
+    private void applyGravityEffect(Vector2 position, float groundY, Set<Vector2> occupiedPositions) {
+        float step = 10f; // Distance to fall per step
+        Vector2 newPosition = new Vector2(position);
+
+        while (newPosition.y > groundY && !occupiedPositions.contains(new Vector2(newPosition.x, newPosition.y - step))) {
+            newPosition.y -= step; // Simulate falling
+        }
+
+        occupiedPositions.remove(position); // Remove old position
+        position.set(newPosition); // Update to new position
+        occupiedPositions.add(newPosition); // Mark new position as occupied
+    }
+
+
+    private boolean isAbove(float x1, float y1, float x2, float y2) {
+        float xTolerance = 100f;
+        return Math.abs(x1 - x2) <= xTolerance && y1 > y2;
+    }
+
+    private void handleCollision(Bird bird, Obstacle obstacle) {
+        if (checkCollision(bird, obstacle)) {
+            obstacle.takeDamage(bird.damage);
+            bird.isFlying = false;
+
+            if (obstacle instanceof TNT) {
+                TNT tnt = (TNT) obstacle;
+                tnt.hasExploded = true;
+                explosionActive = true;
+                explosionTimer = 0f;
+
+                float tntCenterX = (obstacle.position.x + obstacle.width) / 2;
+                float tntCenterY = (obstacle.position.y + obstacle.height) / 2;
+                float explosionRadius = 100f;
+
+                for (Pig pig : pigs) {
+                    float pigCenterX = (pig.position.x + pig.size.get(0)) / 2;
+                    float pigCenterY = (pig.position.x + pig.size.get(1)) / 2;
+
+                    float distance = Vector2.dst(tntCenterX, tntCenterY, pigCenterX, pigCenterY);
+
+                    if (distance <= explosionRadius) {
+                        pig.takeDamage(3);
+                    }
+                    if (pig.isDestroyed){
+                        applyGravityDamage(pig.position.x, pig.position.y);
+                    }
+                }
+
+                for (Obstacle otherObstacle : obstacles) {
+                    if (otherObstacle != obstacle) {
+                        float obstacleCenterX = (otherObstacle.position.x + otherObstacle.width) / 2;
+                        float obstacleCenterY = (otherObstacle.position.y + otherObstacle.height) / 2;
+
+                        float distance = Vector2.dst(tntCenterX, tntCenterY, obstacleCenterX, obstacleCenterY);
+                        if (distance <= explosionRadius) {
+                            otherObstacle.takeDamage(3);
+                        }
+                        if (otherObstacle.isDestroyed){
+                            applyGravityDamage(otherObstacle.position.x, otherObstacle.position.y);
+                        }
+                    }
+                }
+
+                if (obstacle.isDestroyed) {
+                    applyGravityDamage(obstacle.position.x, obstacle.position.y);
+                }
+            }
+        }
+    }
+
+    private void initializeOccupiedPositions() {
+        occupiedPositions = new HashSet<>();
+
+        // Add initial positions of all pigs
+        for (Pig pig : pigs) {
+            occupiedPositions.add(new Vector2(pig.position));
+        }
+
+        // Add initial positions of all obstacles
+        for (Obstacle obstacle : obstacles) {
+            occupiedPositions.add(new Vector2(obstacle.position));
+        }
+    }
+
+    // Helper method to ensure unique positions after movements or interactions
+    private Vector2 findUniquePosition(Vector2 currentPos, Set<Vector2> occupiedPositions, float step) {
+        Vector2 newPos = new Vector2(currentPos);
+        while (occupiedPositions.contains(newPos)) {
+            newPos.add(step, step);// Increment position systematically
+            if (newPos.x >= 720){
+                int randomNum = 600 + (int)(Math.random() * 151);
+                newPos.x = randomNum;
+            }
+        }
+        occupiedPositions.add(newPos);
+        return newPos;
+    }
+
+    // Modified methods
+    private void handleCollision(Bird bird, Pig pig) {
+        if (checkCollision(bird, pig)) {
+            pig.takeDamage(bird.damage);
+            bird.isFlying = false;
+
+            if (bird instanceof Bombird) {
+                Bombird bombird = (Bombird) bird;
+                bombird.hasExploded = true;
+                explosionActive = true;
+                explosionTimer = 0f;
+
+                float birdCenterX = (bird.position.x + bird.size.get(0)) / 2;
+                float birdCenterY = (bird.position.y + bird.size.get(1)) / 2;
+                float explosionRadius = 80f;
+
+                for (Pig otherPig : pigs) {
+                    if (otherPig == pig) continue; // Skip the original pig
+                    float pigCenterX = (otherPig.position.x + otherPig.size.get(0)) / 2;
+                    float pigCenterY = (otherPig.position.y + otherPig.size.get(1)) / 2;
+
+                    float distance = Vector2.dst(birdCenterX, birdCenterY, pigCenterX, pigCenterY);
+                    if (distance <= explosionRadius) {
+                        otherPig.takeDamage(3);
+                    }
+                    if (otherPig.isDestroyed) {
+                        occupiedPositions.remove(otherPig.position); // Remove old position
+                        otherPig.position = findUniquePosition(otherPig.position, occupiedPositions, 10f);
+                        applyGravityDamage(otherPig.position.x, otherPig.position.y);
+                    }
+                }
+
+                for (Obstacle obstacle : obstacles) {
+                    float obstacleCenterX = (obstacle.position.x + obstacle.width) / 2;
+                    float obstacleCenterY = (obstacle.position.y + obstacle.height) / 2;
+
+                    float distance = Vector2.dst(birdCenterX, birdCenterY, obstacleCenterX, obstacleCenterY);
+                    if (distance <= explosionRadius) {
+                        obstacle.takeDamage(3);
+                    }
+                    if (obstacle.isDestroyed) {
+                        occupiedPositions.remove(obstacle.position); // Remove old position
+                        obstacle.position = findUniquePosition(obstacle.position, occupiedPositions, 10f);
+                        applyGravityDamage(obstacle.position.x, obstacle.position.y);
+                    }
+
+                    if (obstacle instanceof TNT) {
+                        TNT tnt = (TNT) obstacle;
+                        tnt.hasExploded = true;
+                        handleTNTExplosion(tnt);
+                    }
+                }
+            }
+        }
+
+        if (pig.isDestroyed) {
+            occupiedPositions.remove(pig.position); // Remove old position
+            pig.position = findUniquePosition(pig.position, occupiedPositions, 10f);
+            applyGravityDamage(pig.position.x, pig.position.y);
+        }
+    }
+
+    private void handleTNTExplosion(TNT tnt) {
+        float tntCenterX = tnt.position.x + tnt.width / 2;
+        float tntCenterY = tnt.position.y + tnt.height / 2;
+        float explosionRadius = 100f;
+
+        for (Pig pig : pigs) {
+            float pigCenterX = (pig.position.x + pig.size.get(0)) / 2;
+            float pigCenterY = (pig.position.y + pig.size.get(1)) / 2;
+
+            float distance = Vector2.dst(tntCenterX, tntCenterY, pigCenterX, pigCenterY);
+            if (distance <= explosionRadius) {
+                pig.takeDamage(3);
+            }
+            if (pig.isDestroyed) {
+                occupiedPositions.remove(pig.position); // Remove old position
+                pig.position = findUniquePosition(pig.position, occupiedPositions, 10f);
+                applyGravityDamage(pig.position.x, pig.position.y);
+            }
+        }
+
+        for (Obstacle obstacle : obstacles) {
+            if (obstacle != tnt) {
+                float obstacleCenterX = (obstacle.position.x + obstacle.width) / 2;
+                float obstacleCenterY = (obstacle.position.y + obstacle.height) / 2;
+
+                float distance = Vector2.dst(tntCenterX, tntCenterY, obstacleCenterX, obstacleCenterY);
+                if (distance <= explosionRadius) {
+                    obstacle.takeDamage(3);
+                }
+                if (obstacle.isDestroyed) {
+                    occupiedPositions.remove(obstacle.position); // Remove old position
+                    obstacle.position = findUniquePosition(obstacle.position, occupiedPositions, 10f);
+                    applyGravityDamage(obstacle.position.x, obstacle.position.y);
+                }
+
+                if (obstacle instanceof TNT && !((TNT) obstacle).hasExploded) {
+                    TNT chainTnt = (TNT) obstacle;
+                    chainTnt.hasExploded = true;
+                    handleTNTExplosion(chainTnt);
+                }
+            }
+        }
+    }
+
+
+    private void clearScreen() {
+        Gdx.gl.glClearColor(0.5f, 0.8f, 0.9f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    }
+
+    private void drawGameElements() {
+        // Draw background
+        batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        // Draw slingshot bands if dragging
+        if (isDragging) {
+            drawSlingshotBands();
+        }
+
+        // Draw game objects
+        drawSlingshot();
+        drawObstacles();
+        drawPigs();
+        drawUI();
+    }
+
+    private void drawSlingshotBands() {
+        Bird firstBird = birds.get(0);
+        float birdX = firstBird.position.x;
+        float birdY = firstBird.position.y;
+
+        // Back band
+        float angleBack = MathUtils.atan2(birdY - anchorBack.y, birdX - anchorBack.x) * MathUtils.radiansToDegrees;
+        float lengthBack = Vector2.dst(anchorBack.x, anchorBack.y, birdX, birdY);
+        batch.draw(bandTexture, anchorBack.x, anchorBack.y, 0, 0, lengthBack, 10, 1, 1, angleBack,
+            0, 0, bandTexture.getWidth(), bandTexture.getHeight(), false, false);
+
+        // Front band
+        float angleFront = MathUtils.atan2(birdY - anchorFront.y, birdX - anchorFront.x) * MathUtils.radiansToDegrees;
+        float lengthFront = Vector2.dst(anchorFront.x, anchorFront.y, birdX, birdY);
+        batch.draw(bandTexture, anchorFront.x, anchorFront.y, 0, 0, lengthFront, 10, 1, 1, angleFront,
+            0, 0, bandTexture.getWidth(), bandTexture.getHeight(), false, false);
+    }
+
+    private void drawSlingshot() {
+        batch.draw(slingshot.texture, slingshot.position.get(0), slingshot.position.get(1),
+            slingshot.size.get(0), slingshot.size.get(1));
+        drawBirds();
+        batch.draw(slingshot2, slingshot.position.get(0) - 5, slingshot.position.get(1),
+            slingshot.size.get(0), slingshot.size.get(1));
+    }
+
+    private void drawBirds() {
+        for (Bird bird : birds) {
+            batch.draw(bird.texture, bird.position.x, bird.position.y,
+                bird.size.get(0), bird.size.get(1));
+        }
+    }
+
+    private void drawObstacles() {
+        for (Obstacle obstacle : obstacles) {
+            obstacle.render(batch);
+        }
+    }
+
+    private void drawPigs() {
+        for (Pig pig : pigs) {
+            batch.draw(pig.texture, pig.position.x, pig.position.y,
+                pig.size.get(0), pig.size.get(1));
+        }
+    }
+
+    private void drawUI() {
+        batch.draw(pauseButton, pauseButton_x, pauseButton_y, pauseButton_w, pauseButton_h);
+        batch.draw(winButton, winButton_x, winButton_y, winButton_w, winButton_h);
+        batch.draw(lossButton, lossButton_x, lossButton_y, lossButton_w, lossButton_h);
+    }
+
+    private void handleInput() {
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            handleButtonClicks();
+        }
+    }
+
+    private void handleButtonClicks() {
+        float mouseX = Gdx.input.getX();
+        float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
+
+        if (isClickInBounds(mouseX, mouseY, pauseButton_x, pauseButton_y, pauseButton_w, pauseButton_h)) {
+            game.setScreen(new PauseGame(game, 1, player));
+        }
+        if (isClickInBounds(mouseX, mouseY, winButton_x, winButton_y, winButton_w, winButton_h)) {
+            game.setScreen(new Win(game, player));
+        }
+        if (isClickInBounds(mouseX, mouseY, lossButton_x, lossButton_y, lossButton_w, lossButton_h)) {
+            game.setScreen(new Loss(game, 1, player));
+        }
+    }
+
+    private boolean isClickInBounds(float x, float y, float buttonX, float buttonY, float width, float height) {
+        return x >= buttonX && x <= buttonX + width && y >= buttonY && y <= buttonY + height;
+    }
+
+
+    private void updateFlyingBirds() {
+        Iterator<Bird> iterator = birds.iterator();
+        while (iterator.hasNext()) {
+            Bird bird = iterator.next();
+            if (bird.isFlying && bird.trajectoryPoints != null && !bird.trajectoryPoints.isEmpty()) {
+                Vector2 targetPoint = bird.trajectoryPoints.get(0);
+                updateBirdPosition(bird, targetPoint);
+
+                if (bird.position.y <= 60) {
+                    handleBirdLanding(bird, iterator);
+                    break;
+                }
+
+                if (bird.trajectoryPoints.isEmpty()) {
+                    bird.isFlying = false;
+                }
+            }
+        }
+    }
+
+    private void updateBirdPosition(Bird bird, Vector2 targetPoint) {
+        float moveSpeed = 0.2f;
+        bird.position.x = MathUtils.lerp(bird.position.x, targetPoint.x, moveSpeed);
+        bird.position.y = MathUtils.lerp(bird.position.y, targetPoint.y, moveSpeed);
+
+        if (Vector2.dst(bird.position.x, bird.position.y, targetPoint.x, targetPoint.y) < 5f) {
+            bird.trajectoryPoints.remove(0);
+        }
+    }
+
+    private void handleBirdLanding(Bird bird, Iterator<Bird> iterator) {
+        bird.isFlying = false;
+        iterator.remove();
+
+        if (!birds.isEmpty()) {
+            Bird nextBird = birds.get(0);
+            nextBird.position.set(90, 160);
+            nextBird.isFlying = false;
+            nextBird.velocity.setZero();
+        }
+    }
+
+    private void handleCollisions() {
+        // Create safe copies of collections
+        List<Bird> activeBirds = new ArrayList<>(birds);
+        List<Pig> activePigs = new ArrayList<>(pigs);
+        List<Obstacle> activeObstacles = new ArrayList<>(obstacles);
+
+        // Tracking lists for removal
+        List<Bird> birdsToRemove = new ArrayList<>();
+        List<Pig> pigsToRemove = new ArrayList<>();
+        List<Obstacle> obstaclesToRemove = new ArrayList<>();
+
+        // Process flying birds using an iterator for safe removal
+        for (Bird bird : activeBirds) {
+            if (bird != null && bird.isFlying) {
+                // Check collisions with pigs
+                for (Pig pig : activePigs) {
+                    handleCollision(bird, pig);
+                    if (bird instanceof Bombird && ((Bombird) bird).hasExploded) {
+                        drawExplosion(bird);
+                    }
+                    if (pig.isDestroyed) {
+                        pigsToRemove.add(pig);
+                        occupiedPositions.remove(pig.position); // Remove old position
+                    }
+                }
+
+                // Check collisions with obstacles
+                for (Obstacle obstacle : activeObstacles) {
+                    handleCollision(bird, obstacle);
+                    if (obstacle instanceof TNT && ((TNT) obstacle).hasExploded) {
+                        drawTNTExplosion(obstacle);
+                    }
+                    if (obstacle.isDestroyed || (obstacle instanceof TNT && ((TNT) obstacle).hasExploded)) {
+                        obstaclesToRemove.add(obstacle);
+                    }
+                }
+
+                if (!bird.isFlying) {
+                    birdsToRemove.add(bird);
+                }
+            }
+        }
+
+        performCollisionCleanup(birdsToRemove, pigsToRemove, obstaclesToRemove);
+    }
+
+    private void drawExplosion(Bird bird) {
+        batch.begin();
+        batch.draw(((Bombird) bird).blastTexture, bird.position.x, bird.position.y);
+        batch.end();
+    }
+
+    private void drawTNTExplosion(Obstacle obstacle) {
+        batch.begin();
+        batch.draw(((TNT) obstacle).blastTexture, obstacle.position.x, obstacle.position.y);
+        batch.end();
+    }
+
+    private void performCollisionCleanup(List<Bird> birdsToRemove, List<Pig> pigsToRemove, List<Obstacle> obstaclesToRemove) {
+        // Remove birds and reset next bird if needed
+        birds.removeAll(birdsToRemove);
+        if (!birds.isEmpty() && !birdsToRemove.isEmpty()) {
+            resetNextBird();
+        }
+
+        // Remove destroyed pigs and obstacles
+        pigs.removeAll(pigsToRemove);
+        obstacles.removeAll(obstaclesToRemove);
+    }
+
+    private void resetNextBird() {
+        Bird nextBird = birds.get(0);
+        nextBird.position.set(90, 160);
+        nextBird.isFlying = false;
+        nextBird.velocity.x = 0;
+        nextBird.velocity.y = 0;
+    }
+
+    private void checkGameConditions() {
+        if (pigs.isEmpty()) {
+            game.setScreen(new Win(game, player));
+            return;
+        }
+
+        if (birds.isEmpty()) {
+            // Make sure no birds are currently in flight
+            boolean birdInFlight = false;
+            for (Bird bird : birds) {
+                if (bird.isFlying) {
+                    birdInFlight = true;
+                    break;
+                }
+            }
+
+            // Only transition to lose screen if no birds are in flight
+            if (!birdInFlight) {
+                game.setScreen(new Loss(game, 1, player));
+                return;
+            }
+        }
+    }
+
+    private void handleBirdRelease() {
+        if (!birds.isEmpty()) {
+            Bird bird = birds.get(0);
+            bird.launch();
+        }
+        isDragging = false;
+    }
+
+    private void updateBirdPhysics(Bird bird, float delta) {
+        // Update position based on velocity
+        bird.position.x += bird.velocity.x * delta;
+        bird.position.y += bird.velocity.y * delta;
+
+        // Apply gravity to vertical velocity
+        bird.velocity.y += GRAVITY * delta;
+    }
+
+    private void updateFlyingBirds(float delta) {
+        Iterator<Bird> iterator = birds.iterator();
+        while (iterator.hasNext()) {
+            Bird bird = iterator.next();
+            if (bird.isFlying) {
+                updateBirdPhysics(bird, delta);
+
+                // Check if bird has hit the ground
+                if (bird.position.y <= 60) {
+                    handleBirdLanding(bird, iterator);
+                    break;
+                }
+            }
+        }
+    }
+
+    private ArrayList<Vector2> calculateTrajectoryPoints(float startX, float startY, float velocityX, float velocityY, float gravity) {
+        ArrayList<Vector2> points = new ArrayList<>();
+        float timestep = 1/60f; // Simulation timestep (60 FPS)
+        float maxTime = 5.0f;   // Maximum time to simulate
+
+        float posX = startX;
+        float posY = startY;
+        float velX = velocityX;
+        float velY = velocityY;
+
+        for (float t = 0; t < maxTime; t += timestep) {
+            // Add current position to trajectory
+            points.add(new Vector2(posX, posY));
+
+            // Update position and velocity using physics
+            posX += velX * timestep;
+            posY += velY * timestep;
+            velY += gravity * timestep;
+
+            // Stop if trajectory hits ground
+            if (posY <= 60) { // Adjust ground height as needed
+                break;
+            }
+        }
+
+        return points;
+    }
+
+    private void updateBirdTrajectory() {
+        if (!isDragging || birds.isEmpty()) return;
+
+        Bird firstBird = birds.get(0);
+        int screenY = Gdx.graphics.getHeight() - Gdx.input.getY();
+
+        // Calculate launch velocity based on drag
+        float dragDX = initialSlingshotPosition.x - Gdx.input.getX();
+        float dragDY = initialSlingshotPosition.y - screenY;
+
+        float dragDistance = Math.min(Vector2.len(dragDX, dragDY), MAX_DRAG_DISTANCE);
+        float dragAngle = MathUtils.atan2(dragDY, dragDX);
+
+        // Calculate launch velocity
+        float launchSpeed = LAUNCH_SPEED_MULTIPLIER * (dragDistance / MAX_DRAG_DISTANCE);
+        float launchVelocityX = launchSpeed * MathUtils.cos(dragAngle);
+        float launchVelocityY = launchSpeed * MathUtils.sin(dragAngle);
+
+        // Store launch velocity in bird for later use
+        firstBird.launchVelocityX = launchVelocityX;
+        firstBird.launchVelocityY = launchVelocityY;
+
+        // Draw trajectory preview
+        drawTrajectoryPreview(firstBird, launchVelocityX, launchVelocityY);
+    }
+
+    private void drawTrajectoryPreview(Bird bird, float velocityX, float velocityY) {
+        // Get trajectory points
+        ArrayList<Vector2> previewPoints = calculateTrajectoryPoints(
+            bird.position.x, bird.position.y, velocityX, velocityY, GRAVITY);
+
+        // Begin shape rendering
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+        // Draw dotted line trajectory
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+        // Use white dots with fade out
+        int totalPoints = previewPoints.size();
+        float dotSpacing = 5; // Show a dot every X points
+        float dotSize = 3f;   // Size of trajectory dots
+
+        for (int i = 0; i < totalPoints; i += dotSpacing) {
+            Vector2 point = previewPoints.get(i);
+
+            // Calculate fade out based on position in trajectory
+            float alpha = 1.0f - ((float)i / totalPoints);
+            shapeRenderer.setColor(1, 1, 1, alpha * 0.7f);
+
+            // Draw circular dot
+            shapeRenderer.circle(point.x, point.y, dotSize * (1.0f - ((float)i / totalPoints)));
+        }
+
+        shapeRenderer.end();
+
+        Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 }

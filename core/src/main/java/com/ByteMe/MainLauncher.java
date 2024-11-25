@@ -27,9 +27,9 @@ public class MainLauncher extends Game {
 
     @Override
     public void create() {
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("bg_music.mp3"));
-        backgroundMusic.setLooping(true);
-        backgroundMusic.play();
+        //backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("bg_music.mp3"));
+        //backgroundMusic.setLooping(true);
+        //backgroundMusic.play();
         setScreen(new LoadingScreen(this));
 //        Player player = new Player();
 //        setScreen(new Win(this, player));
