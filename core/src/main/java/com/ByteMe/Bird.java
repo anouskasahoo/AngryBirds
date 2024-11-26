@@ -3,9 +3,12 @@ package com.ByteMe;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class Bird {
+public abstract class Bird implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     public Texture texture;
     public ArrayList<Integer> size;
     public Vector2 position;

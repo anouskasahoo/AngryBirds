@@ -4,8 +4,10 @@ import java.io.Serializable;
 import java.util.Map;
 
 public class Player implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     String name;
-    private GameState loadedGame;
+    private transient GameState loadedGame;
 
     public String getName() {
         return name;

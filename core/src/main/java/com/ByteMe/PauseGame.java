@@ -7,6 +7,10 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
 public class PauseGame implements Screen {
 
     private SpriteBatch batch;
@@ -17,8 +21,9 @@ public class PauseGame implements Screen {
     private MainLauncher game;
     private final Player player;
     private int status;
+    private GameState gameState;
 
-    public PauseGame(MainLauncher game, int i, Player player) {
+    public PauseGame(MainLauncher game, int i, Player player, GameState gameState) {
         this.game=game;
         this.player = player;
         batch = new SpriteBatch();
@@ -57,6 +62,7 @@ public class PauseGame implements Screen {
             float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             if (mouseX >= resume_x && mouseX <= resume_x+resume_width && mouseY >= resume_y && mouseY <= resume_y+resume_height) {
+                /*
                 switch (status){
                     case 0:
                         //game.setScreen(new LoadedGame(game, player));
@@ -71,12 +77,18 @@ public class PauseGame implements Screen {
                         //game.setScreen(new Level3(game, player));
                         break;
                 }
+                 */
+                //resume
             }
             if (mouseX >= save_x && mouseX <= save_x+save_width && mouseY >= save_y && mouseY <= save_y+save_height) {
                 game.setScreen(new LevelsScreen(game, player));
+                //end game
             }
             if (mouseX >= end_x && mouseX <= end_x+end_width && mouseY >= end_y && mouseY <= end_y+end_height) {
-                game.setScreen(new HomeScreen(game, player));
+                System.out.println("Pause trying");
+                saveGame(gameState, player);
+                System.out.println("Pause success");
+                //save game
             }
 
         }
@@ -113,4 +125,20 @@ public class PauseGame implements Screen {
     public void dispose() {
 
     }
+
+    public static void saveGame(GameState gameState, Player player) {
+        try (FileOutputStream fileOut = new FileOutputStream("saved.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+            System.out.println("Save trying");
+            out.writeObject(gameState);
+            System.out.println("Game state saved to saved.ser");
+
+            // Update player's loaded game
+            player.setLoadedGame(gameState);
+            System.out.println("Player's loaded game updated.");
+        } catch (IOException e) {
+            System.err.println("Error saving game: " + e.getMessage());
+        }
+    }
+
 }

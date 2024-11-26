@@ -4,7 +4,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
-public abstract class Obstacle{
+import java.io.Serializable;
+
+public abstract class Obstacle implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     protected Texture texture;
     protected Vector2 position;
     protected float width, height;

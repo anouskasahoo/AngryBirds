@@ -1,5 +1,6 @@
 package com.ByteMe;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
@@ -10,11 +11,17 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class Level {
+public abstract class Level implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     protected final MainLauncher game;
     protected final SpriteBatch batch;
     protected final Texture pauseButton;
@@ -56,6 +63,8 @@ public abstract class Level {
     protected float blastTimer = 0f;
     protected Vector2 blastPosition = new Vector2();
     protected boolean isBlastActive = false;
+    protected int score;
+    protected GameState gameState;
 
     public Level(MainLauncher game, String t, int p1, int p2, int s1, int s2, Player player) {
         this.game = game;
@@ -73,6 +82,8 @@ public abstract class Level {
         this.initialSlingshotPosition = new Vector2(slingshot.position.get(0), slingshot.position.get(1));
         this.player = player;
         blastTexture = new Texture("blast.png");
+        this.score = 0;
+        this.gameState = new GameState(this, this.score, player);
     }
 
     public void dispose() {
@@ -90,6 +101,7 @@ public abstract class Level {
             }
         }
     }
+
 
 //    protected boolean checkCollision(Bird bird, Pig pig) {
 //        return bird.position.x < pig.position.x + pig.size.get(0) &&

@@ -10,6 +10,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.*;
 
 public class Level1 extends Level implements Screen , InputProcessor {
@@ -33,50 +36,68 @@ public class Level1 extends Level implements Screen , InputProcessor {
         shapeRenderer = new ShapeRenderer();
         this.initialSlingshotPosition = new Vector2(slingshot.position.get(0), slingshot.position.get(1));
 
+        if (player.getLoadedGame()==null||player.getLoadedGame().getLevel() instanceof Level1) {
+            // Initialize birds
+            birds = new ArrayList<>();
+            Bombird b1 = new Bombird();
+            b1.position.set(90, 160);
+            birds.add(b1);
 
-        // Initialize birds
-        birds = new ArrayList<>();
-        Bombird b1 = new Bombird();
-        b1.position.set(90, 160);
-        birds.add(b1);
+            TeleBird b2 = new TeleBird();
+            b2.position.set(50, 70);
+            birds.add(b2);
 
-        TeleBird b2 = new TeleBird();
-        b2.position.set(50, 70);
-        birds.add(b2);
+            ClassicBird b3 = new ClassicBird();
+            b3.position.set(0, 70);
+            birds.add(b3);
 
-        ClassicBird b3 = new ClassicBird();
-        b3.position.set(0, 70);
-        birds.add(b3);
+            //Initialize pigs
+            pigs = new ArrayList<>();
+            ClassicPig cp1 = new ClassicPig();
+            cp1.position.set(677, 70);
+            pigs.add(cp1);
 
-        //Initialize pigs
-        pigs = new ArrayList<>();
-        ClassicPig cp1 = new ClassicPig();
-        cp1.position.set(677, 70);
-        pigs.add(cp1);
+            ClassicPig cp2 = new ClassicPig();
+            cp2.position.set(628, 115);
+            pigs.add(cp2);
 
-        ClassicPig cp2 = new ClassicPig();
-        cp2.position.set(628, 115);
-        pigs.add(cp2);
+            KingPig kp1 = new KingPig();
+            kp1.position.set(720, 205);
+            pigs.add(kp1);
 
-        KingPig kp1 = new KingPig();
-        kp1.position.set(720, 205);
-        pigs.add(kp1);
+            PrettyPig pp1 = new PrettyPig();
+            pp1.position.set(720, 110);
+            pigs.add(pp1);
 
-        PrettyPig pp1 = new PrettyPig();
-        pp1.position.set(720, 110);
-        pigs.add(pp1);
+            obstacles.add(new Wood(new Vector2(585, 110), Wood.Orientation.HORIZONTAL));
+            obstacles.add(new Wood(new Vector2(580, 70), Wood.Orientation.VERTICAL));
+            obstacles.add(new TNT(new Vector2(720, 70)));
+            obstacles.add(new TNT(new Vector2(630, 70)));
+            obstacles.add(new TNT(new Vector2(580, 115)));
+            obstacles.add(new TNT(new Vector2(720, 160)));
+            obstacles.add(new Wood(new Vector2(625, 155), Wood.Orientation.HORIZONTAL));
+            obstacles.add(new Wood(new Vector2(670, 115), Wood.Orientation.VERTICAL));
+            obstacles.add(new Stone(new Vector2(672, 115), Stone.Orientation.HORIZONTAL));
+            obstacles.add(new Stone(new Vector2(720, 115), Stone.Orientation.VERTICAL));
+            obstacles.add(new Stone(new Vector2(760, 115), Stone.Orientation.VERTICAL));
+        }
+        else{
+            //birds.addAll(player.getLoadedGame().birds);
+            //obstacles.addAll(player.getLoadedGame().obstacles);
+            //pigs.addAll(player.getLoadedGame().pigs);
+            /*
+            GameState gameState = null;
 
-        obstacles.add(new Wood(new Vector2(585, 110), Wood.Orientation.HORIZONTAL));
-        obstacles.add(new Wood(new Vector2(580, 70), Wood.Orientation.VERTICAL));
-        obstacles.add(new TNT(new Vector2(720, 70)));
-        obstacles.add(new TNT(new Vector2(630, 70)));
-        obstacles.add(new TNT(new Vector2(580, 115)));
-        obstacles.add(new TNT(new Vector2(720, 160)));
-        obstacles.add(new Wood(new Vector2(625, 155), Wood.Orientation.HORIZONTAL));
-        obstacles.add(new Wood(new Vector2(670, 115), Wood.Orientation.VERTICAL));
-        obstacles.add(new Stone(new Vector2(672, 115), Stone.Orientation.HORIZONTAL));
-        obstacles.add(new Stone(new Vector2(720, 115), Stone.Orientation.VERTICAL));
-        obstacles.add(new Stone(new Vector2(760, 115), Stone.Orientation.VERTICAL));
+            try (FileInputStream fileIn = new FileInputStream();
+                 ObjectInputStream in = new ObjectInputStream(fileIn)) {
+                gameState = (GameState) in.readObject();  // Deserialize the GameState object
+                System.out.println("Game state has been loaded from " + fileName);
+            } catch (IOException | ClassNotFoundException e) {
+                System.err.println("Error loading game state: " + e.getMessage());
+            }
+             */
+
+        }
     }
 
     @Override
@@ -572,7 +593,10 @@ public class Level1 extends Level implements Screen , InputProcessor {
         float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
         if (isClickInBounds(mouseX, mouseY, pauseButton_x, pauseButton_y, pauseButton_w, pauseButton_h)) {
-            game.setScreen(new PauseGame(game, 1, player));
+            System.out.println("Level 1 trying");
+            this.gameState.setLevel(this);
+            System.out.println("Level 1 success");
+            game.setScreen(new PauseGame(game, 1, player, this.gameState));
         }
         if (isClickInBounds(mouseX, mouseY, winButton_x, winButton_y, winButton_w, winButton_h)) {
             game.setScreen(new Win(game, player));

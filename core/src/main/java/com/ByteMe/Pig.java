@@ -3,9 +3,11 @@ package com.ByteMe;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class Pig{
+public abstract class Pig implements Serializable {
+    private static final long serialVersionUID = 1L;
     public Texture texture;
     public Vector2 position;
     public ArrayList<Integer> size;
