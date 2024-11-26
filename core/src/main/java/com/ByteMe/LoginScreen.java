@@ -21,7 +21,8 @@ public class LoginScreen implements Screen {
     private TextField playerNameField;
     private Skin skin;
     private String playerName = "";
-
+    private Texture popupTexture;
+    private int popupTimer = 0;
 
     public LoginScreen(MainLauncher game) {
         this.game = game;
@@ -38,6 +39,8 @@ public class LoginScreen implements Screen {
         playerNameField.setSize(200, 40);
         playerNameField.setMessageText("Enter your name");
         stage.addActor(playerNameField);
+
+        popupTexture = new Texture("popup.png");
 
         Gdx.input.setInputProcessor(stage);
 
@@ -62,8 +65,16 @@ public class LoginScreen implements Screen {
             }
 
             if (mouseX >= 325 && mouseX <= 325+150 && mouseY >= 50 && mouseY <= 50+60){
-                player.setName(playerNameField.getText());
-                game.setScreen(new HomeScreen(game, player));
+                //player.setName(playerNameField.getText());
+                //game.setScreen(new HomeScreen(game, player));
+                String enteredName = playerNameField.getText().trim();
+
+                if (enteredName.isEmpty()) {
+                    popupTimer = 80;
+                } else {
+                    player.setName(enteredName);
+                    game.setScreen(new HomeScreen(game, player));
+                }
             }
 
         }
@@ -72,6 +83,14 @@ public class LoginScreen implements Screen {
         batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.draw(exitButton, 15, 15, 80, 30);
         batch.draw(playButton, 325, 50, 150, 60);
+
+        if (popupTimer > 0) {
+            float popupX = 160; //(Gdx.graphics.getWidth() - 300) / 2; // Center popup horizontally
+            float popupY = 75; //(Gdx.graphics.getHeight() - 150) / 2; // Center popup vertically
+            batch.draw(popupTexture, popupX, popupY, 480, 220); // Adjust size as needed
+            popupTimer -= delta; // Decrease timer
+        }
+
         batch.end();
         stage.act(delta);
         stage.draw();
