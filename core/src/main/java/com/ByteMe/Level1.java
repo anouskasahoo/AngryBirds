@@ -94,6 +94,15 @@ public class Level1 extends Level implements Screen , InputProcessor {
         clearScreen();
         batch.begin();
         drawGameElements();
+        if (isBlastActive) {
+            batch.draw(blastTexture, blastPosition.x, blastPosition.y, 50, 50);
+
+            blastTimer += delta;
+            if (blastTimer >= 1f) { // 2.5 seconds
+                isBlastActive = false;
+                blastTimer = 0f;
+            }
+        }
         batch.end();
         initializeOccupiedPositions();
         handleInput();
@@ -319,18 +328,55 @@ public class Level1 extends Level implements Screen , InputProcessor {
         }
     }
 
-    // Helper method to ensure unique positions after movements or interactions
-    private Vector2 findUniquePosition(Vector2 currentPos, Set<Vector2> occupiedPositions, float step) {
+    private Vector2 findUniquePosition(Vector2 currentPos, Set<Vector2> occupiedPositions, float objectWidth, float objectHeight) {
         Vector2 newPos = new Vector2(currentPos);
-        while (occupiedPositions.contains(newPos)) {
-            newPos.add(step, step);// Increment position systematically
-            if (newPos.x >= 720){
-                int randomNum = 600 + (int)(Math.random() * 151);
-                newPos.x = randomNum;
+        int attempts = 0;
+        int maxAttempts = 200; // Increased attempts
+
+        while (attempts < maxAttempts) {
+            // Check if the new position conflicts with any existing positions
+            boolean positionConflicts = occupiedPositions.stream()
+                .anyMatch(existingPos -> isOverlapping(newPos, existingPos, objectWidth, objectHeight));
+
+            if (!positionConflicts) {
+                // If no conflict, add the position and return it
+                occupiedPositions.add(newPos);
+                return newPos;
             }
+
+            // Try different strategies to find a unique position
+            if (attempts < 50) {
+                // Incrementally move position
+                newPos.x += 20 + (attempts * 5);
+                newPos.y += 20 + (attempts * 5);
+            } else {
+                // More random repositioning in a wider area
+                newPos.x = 600 + (int)(Math.random() * 200);
+                newPos.y = 70 + (int)(Math.random() * 200);
+            }
+
+            // Ensure position stays within reasonable game bounds
+            newPos.x = Math.max(500, Math.min(newPos.x, 800));
+            newPos.y = Math.max(50, Math.min(newPos.y, 250));
+
+            attempts++;
         }
+
+        // Fallback with guaranteed unique position
+        newPos.set(
+            600 + (int)(Math.random() * 200),
+            70 + (int)(Math.random() * 200)
+        );
         occupiedPositions.add(newPos);
         return newPos;
+    }
+
+    // Helper method to check for precise object overlap
+    private boolean isOverlapping(Vector2 newPos, Vector2 existingPos, float width, float height) {
+        return !(newPos.x + width < existingPos.x ||
+            newPos.x > existingPos.x + width ||
+            newPos.y + height < existingPos.y ||
+            newPos.y > existingPos.y + height);
     }
 
     // Modified methods
@@ -360,7 +406,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
                     }
                     if (otherPig.isDestroyed) {
                         occupiedPositions.remove(otherPig.position); // Remove old position
-                        otherPig.position = findUniquePosition(otherPig.position, occupiedPositions, 10f);
+                        otherPig.position = findUniquePosition(otherPig.position, occupiedPositions, 70f, 70f);
                         applyGravityDamage(otherPig.position.x, otherPig.position.y);
                     }
                 }
@@ -375,7 +421,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
                     }
                     if (obstacle.isDestroyed) {
                         occupiedPositions.remove(obstacle.position); // Remove old position
-                        obstacle.position = findUniquePosition(obstacle.position, occupiedPositions, 10f);
+                        obstacle.position = findUniquePosition(obstacle.position, occupiedPositions, 70f, 70f);
                         applyGravityDamage(obstacle.position.x, obstacle.position.y);
                     }
 
@@ -390,7 +436,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
 
         if (pig.isDestroyed) {
             occupiedPositions.remove(pig.position); // Remove old position
-            pig.position = findUniquePosition(pig.position, occupiedPositions, 10f);
+            pig.position = findUniquePosition(pig.position, occupiedPositions, 70f, 70f);
             applyGravityDamage(pig.position.x, pig.position.y);
         }
     }
@@ -410,7 +456,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
             }
             if (pig.isDestroyed) {
                 occupiedPositions.remove(pig.position); // Remove old position
-                pig.position = findUniquePosition(pig.position, occupiedPositions, 10f);
+                pig.position = findUniquePosition(pig.position, occupiedPositions, 70f, 70f);
                 applyGravityDamage(pig.position.x, pig.position.y);
             }
         }
@@ -426,7 +472,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
                 }
                 if (obstacle.isDestroyed) {
                     occupiedPositions.remove(obstacle.position); // Remove old position
-                    obstacle.position = findUniquePosition(obstacle.position, occupiedPositions, 10f);
+                    obstacle.position = findUniquePosition(obstacle.position, occupiedPositions, 70f, 70f);
                     applyGravityDamage(obstacle.position.x, obstacle.position.y);
                 }
 
@@ -600,6 +646,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
                     handleCollision(bird, pig);
                     if (bird instanceof Bombird && ((Bombird) bird).hasExploded) {
                         drawExplosion(bird);
+                        drawBlastEffect(bird.position.x, bird.position.y);
                     }
                     if (pig.isDestroyed) {
                         pigsToRemove.add(pig);
@@ -612,6 +659,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
                     handleCollision(bird, obstacle);
                     if (obstacle instanceof TNT && ((TNT) obstacle).hasExploded) {
                         drawTNTExplosion(obstacle);
+                        drawBlastEffect(bird.position.x, bird.position.y);
                     }
                     if (obstacle.isDestroyed || (obstacle instanceof TNT && ((TNT) obstacle).hasExploded)) {
                         obstaclesToRemove.add(obstacle);
@@ -625,6 +673,12 @@ public class Level1 extends Level implements Screen , InputProcessor {
         }
 
         performCollisionCleanup(birdsToRemove, pigsToRemove, obstaclesToRemove);
+    }
+
+    private void drawBlastEffect(float x, float y) {
+        blastPosition.set(x, y);
+        isBlastActive = true;
+        blastTimer = 0f;
     }
 
     private void drawExplosion(Bird bird) {
