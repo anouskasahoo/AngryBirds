@@ -1,8 +1,9 @@
 package com.ByteMe;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class Player {
+public class Player implements Serializable {
     String name;
 
     public String getName() {
