@@ -5,5 +5,6 @@ public class ClassicBird extends Bird{
         super("classicBird.png");
         size.add(70);
         size.add(70);
+        damage = 1;
     }
 }

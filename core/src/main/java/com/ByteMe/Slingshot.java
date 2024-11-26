@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import java.util.ArrayList;
 
 public class Slingshot {
-    public Texture texture;
+    public Texture texture = new Texture("slingshot1.png");
     public ArrayList<Integer> position;
     public ArrayList<Integer> size;
 

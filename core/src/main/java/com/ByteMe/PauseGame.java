@@ -59,16 +59,16 @@ public class PauseGame implements Screen {
             if (mouseX >= resume_x && mouseX <= resume_x+resume_width && mouseY >= resume_y && mouseY <= resume_y+resume_height) {
                 switch (status){
                     case 0:
-                        game.setScreen(new LoadedGame(game, player));
+                        //game.setScreen(new LoadedGame(game, player));
                         break;
                     case 1:
                         game.setScreen(new Level1(game, player));
                         break;
                     case 2:
-                        game.setScreen(new Level2(game, player));
+                        //game.setScreen(new Level2(game, player));
                         break;
                     case 3:
-                        game.setScreen(new Level3(game, player));
+                        //game.setScreen(new Level3(game, player));
                         break;
                 }
             }
