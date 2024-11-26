@@ -12,16 +12,14 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.util.*;
 
-
 public class Level1 extends Level implements Screen , InputProcessor {
 
     private final Texture slingshot2;
     private final Texture backgroundTexture;
     private final Player player;
     private final MainLauncher game;
-    private Vector2 initialPosition;   // Stores the initial position of the first bird
+    private Vector2 initialPosition;
     private ShapeRenderer shapeRenderer;
-    private Vector2 dragStartPosition;
     private Vector2 initialSlingshotPosition;
     private Set<Vector2> occupiedPositions;
 
@@ -49,7 +47,6 @@ public class Level1 extends Level implements Screen , InputProcessor {
         ClassicBird b3 = new ClassicBird();
         b3.position.set(0, 70);
         birds.add(b3);
-
 
         //Initialize pigs
         pigs = new ArrayList<>();
@@ -94,10 +91,10 @@ public class Level1 extends Level implements Screen , InputProcessor {
         batch.begin();
         drawGameElements();
         if (isBlastActive) {
-            batch.draw(blastTexture, blastPosition.x, blastPosition.y, 50, 50);
+            batch.draw(blastTexture, blastPosition.x, blastPosition.y, 100, 100);
 
             blastTimer += delta;
-            if (blastTimer >= 1f) { // 2.5 seconds
+            if (blastTimer >= 0.5f) {
                 isBlastActive = false;
                 blastTimer = 0f;
             }
@@ -112,20 +109,25 @@ public class Level1 extends Level implements Screen , InputProcessor {
     }
 
     @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        screenY = Gdx.graphics.getHeight() - screenY; // Convert to game coordinates
-        Bird firstBird = birds.get(0);
-        float birdX = firstBird.position.x;
-        float birdY = firstBird.position.y;
-        float birdWidth = firstBird.size.get(0);
-        float birdHeight = firstBird.size.get(1);
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) throws IndexOutOfBoundsException{
+        screenY = Gdx.graphics.getHeight() - screenY;
+       try{
+           Bird firstBird = birds.get(0);
+           float birdX = firstBird.position.x;
+           float birdY = firstBird.position.y;
+           float birdWidth = firstBird.size.get(0);
+           float birdHeight = firstBird.size.get(1);
 
-        // Check if click is within the bounds of the first bird
-        if (screenX >= birdX && screenX <= birdX + birdWidth && screenY >= birdY && screenY <= birdY + birdHeight) {
-            isDragging = true; // Start dragging
-            return true;
-        }
-        return false;
+           if (screenX >= birdX && screenX <= birdX + birdWidth && screenY >= birdY && screenY <= birdY + birdHeight) {
+               isDragging = true;
+               return true;
+           }
+           return false;
+       }
+       catch (IndexOutOfBoundsException e){
+           checkGameConditions();
+       }
+       return false;
     }
 
     @Override
@@ -133,7 +135,6 @@ public class Level1 extends Level implements Screen , InputProcessor {
         if (isDragging) {
             screenY = Gdx.graphics.getHeight() - screenY;
 
-            // Constrain dragging backward only
             if (screenX <= initialSlingshotPosition.x && screenY <= 160 && screenY >= initialSlingshotPosition.y + 10) {
                 birds.get(0).position.set(0, screenX);
                 birds.get(0).position.set(1, screenY);
@@ -232,6 +233,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
             if (isAbove(pig.position.x, pig.position.y, destroyedX, destroyedY)) {
                 pig.takeDamage(1);
                 pig.position.set(destroyedX, destroyedY);
+                findUniquePosition(pig.position, occupiedPositions,pig.size.get(0), pig.size.get(1));
                 applyGravityEffect(pig.position, 70, occupiedPositions);
             }
         }
@@ -240,6 +242,8 @@ public class Level1 extends Level implements Screen , InputProcessor {
             if (isAbove(obstacle.position.x, obstacle.position.y, destroyedX, destroyedY)) {
                 obstacle.takeDamage(1);
                 obstacle.position.set(destroyedX, destroyedY);
+                findUniquePosition(obstacle.position, occupiedPositions, (int) obstacle.width, (int) obstacle.height);
+                applyGravityEffect(obstacle.position, 70, occupiedPositions);
             }
         }
     }
@@ -327,7 +331,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
         }
     }
 
-    private Vector2 findUniquePosition(Vector2 currentPos, Set<Vector2> occupiedPositions, float objectWidth, float objectHeight) {
+    private Vector2 findUniquePosition(Vector2 currentPos, Set<Vector2> occupiedPositions, Integer objectWidth, Integer objectHeight) {
         Vector2 newPos = new Vector2(currentPos);
         int attempts = 0;
         int maxAttempts = 200; // Increased attempts
@@ -405,7 +409,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
                     }
                     if (otherPig.isDestroyed) {
                         occupiedPositions.remove(otherPig.position); // Remove old position
-                        otherPig.position = findUniquePosition(otherPig.position, occupiedPositions, 70f, 70f);
+                        //otherPig.position = findUniquePosition(otherPig.position, occupiedPositions, 70f, 70f);
                         applyGravityDamage(otherPig.position.x, otherPig.position.y);
                     }
                 }
@@ -420,7 +424,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
                     }
                     if (obstacle.isDestroyed) {
                         occupiedPositions.remove(obstacle.position); // Remove old position
-                        obstacle.position = findUniquePosition(obstacle.position, occupiedPositions, 70f, 70f);
+                        //obstacle.position = findUniquePosition(obstacle.position, occupiedPositions, 70f, 70f);
                         applyGravityDamage(obstacle.position.x, obstacle.position.y);
                     }
 
@@ -435,7 +439,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
 
         if (pig.isDestroyed) {
             occupiedPositions.remove(pig.position); // Remove old position
-            pig.position = findUniquePosition(pig.position, occupiedPositions, 70f, 70f);
+            //pig.position = findUniquePosition(pig.position, occupiedPositions, 70f, 70f);
             applyGravityDamage(pig.position.x, pig.position.y);
         }
     }
@@ -455,7 +459,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
             }
             if (pig.isDestroyed) {
                 occupiedPositions.remove(pig.position); // Remove old position
-                pig.position = findUniquePosition(pig.position, occupiedPositions, 70f, 70f);
+                //pig.position = findUniquePosition(pig.position, occupiedPositions, 70f, 70f);
                 applyGravityDamage(pig.position.x, pig.position.y);
             }
         }
@@ -471,7 +475,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
                 }
                 if (obstacle.isDestroyed) {
                     occupiedPositions.remove(obstacle.position); // Remove old position
-                    obstacle.position = findUniquePosition(obstacle.position, occupiedPositions, 70f, 70f);
+                    //obstacle.position = findUniquePosition(obstacle.position, occupiedPositions, 70f, 70f);
                     applyGravityDamage(obstacle.position.x, obstacle.position.y);
                 }
 
@@ -483,7 +487,6 @@ public class Level1 extends Level implements Screen , InputProcessor {
             }
         }
     }
-
 
     private void clearScreen() {
         Gdx.gl.glClearColor(0.5f, 0.8f, 0.9f, 1);
@@ -582,7 +585,6 @@ public class Level1 extends Level implements Screen , InputProcessor {
     private boolean isClickInBounds(float x, float y, float buttonX, float buttonY, float width, float height) {
         return x >= buttonX && x <= buttonX + width && y >= buttonY && y <= buttonY + height;
     }
-
 
     private void updateFlyingBirds() {
         Iterator<Bird> iterator = birds.iterator();
