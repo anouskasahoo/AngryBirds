@@ -19,13 +19,13 @@ public abstract class Obstacle{
         this.health = health;
     }
 
-    public void takeDamage(int damage) {
+    public void takeDamage(float damage) {
         this.health -= damage;
         if (this.health <= 0) {
             isDestroyed = true;
             if (this instanceof TNT){
-                TNT t = (TNT) this;
-                t.hasExploded = true;
+                ((TNT) this).hasExploded = true;
+                this.isDestroyed = true;
             }
         }
     }

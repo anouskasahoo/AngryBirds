@@ -19,7 +19,7 @@ public abstract class Pig{
         size = new ArrayList<>(2);
     }
 
-    public void takeDamage(int damage) {
+    public void takeDamage(float damage) {
         health -= damage;
         if (health <= 0) {
             isDestroyed = true;

@@ -52,6 +52,10 @@ public abstract class Level {
     protected Texture slingshot2;
     private Vector2 initialSlingshotPosition;
     private final Player player;
+    protected Texture blastTexture;
+    protected float blastTimer = 0f;
+    protected Vector2 blastPosition = new Vector2();
+    protected boolean isBlastActive = false;
 
     public Level(MainLauncher game, String t, int p1, int p2, int s1, int s2, Player player) {
         this.game = game;
@@ -68,6 +72,7 @@ public abstract class Level {
         shapeRenderer = new ShapeRenderer();
         this.initialSlingshotPosition = new Vector2(slingshot.position.get(0), slingshot.position.get(1));
         this.player = player;
+        blastTexture = new Texture("blast.png");
     }
 
     public void dispose() {
