@@ -1019,7 +1019,7 @@ public class Level1 extends Level implements Screen {
     private boolean isDragging = false;
 
     public Level1(MainLauncher game, Player player) {
-        super(game, "slingshot1.png", 100, 70, 50, 150);
+        super(game, "slingshot1.png", 100, 70, 50, 150, player);
         slingshot2 = new Texture("slingshot2.png");
         backgroundTexture = new Texture("Level1_bg.png");
         this.game = game;

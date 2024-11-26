@@ -44,6 +44,7 @@ public abstract class Bird {
     public ArrayList<Integer> position; // Position of the bird (X, Y)
     public ArrayList<Integer> size; // Size of the bird (width, height)
     public Vector2 velocity; // Velocity of the bird (using Vector2 for simplicity)
+    public int damage;
 
     // Constructor
     public Bird(String textureFile) {
