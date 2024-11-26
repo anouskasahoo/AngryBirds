@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class Player implements Serializable {
     String name;
+    private GameState loadedGame;
 
     public String getName() {
         return name;
@@ -12,6 +13,7 @@ public class Player implements Serializable {
 
     public Player(String name) {
         this.name = name;
+        this.loadedGame = null;
     }
     public Player(){
 
@@ -48,4 +50,12 @@ public class Player implements Serializable {
     Level currentLevel;
     int totalScore;
     Map<Level, Integer> progressLog;
+
+    public GameState getLoadedGame() {
+        return loadedGame;
+    }
+
+    public void setLoadedGame(GameState loadedGame) {
+        this.loadedGame = loadedGame;
+    }
 }

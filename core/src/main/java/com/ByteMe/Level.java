@@ -10,12 +10,11 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class Level implements Serializable {
+public abstract class Level {
     protected final MainLauncher game;
     protected final SpriteBatch batch;
     protected final Texture pauseButton;
