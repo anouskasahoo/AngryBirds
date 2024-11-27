@@ -1,4 +1,3 @@
-
 package com.ByteMe;
 
 import com.badlogic.gdx.Gdx;

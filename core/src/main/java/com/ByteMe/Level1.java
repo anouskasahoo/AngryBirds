@@ -9,11 +9,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
 import java.util.*;
 
 public class Level1 extends Level implements Screen , InputProcessor {
@@ -83,20 +78,6 @@ public class Level1 extends Level implements Screen , InputProcessor {
             birds.addAll(player.getLoadedGame().getLevel().activeBirds);
             obstacles.addAll(player.getLoadedGame().getLevel().activeObstacles);
             pigs.addAll(player.getLoadedGame().getLevel().activePigs);
-
-//            try (FileInputStream fileIn = new FileInputStream("saved.ser");
-//                ObjectInputStream in = new ObjectInputStream(fileIn)) {
-//                GameState gameState = (GameState) in.readObject();
-//                player.setLoadedGame(gameState);
-//                System.out.println("Game state loaded from saved.ser");
-//                System.out.println(gameState.getLevel().levelNumber);
-//
-//            } catch (IOException | ClassNotFoundException e) {
-//                System.err.println("Error loading game: " + e.getMessage());
-//            }
-//            activeBirds = new ArrayList<>(birds);
-//            activePigs = new ArrayList<>(pigs);
-//            activeObstacles = new ArrayList<>(obstacles);
             activeBirds.addAll(birds);
             activePigs.addAll(pigs);
             activeObstacles.addAll(obstacles);
@@ -124,7 +105,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
         batch.begin();
         drawGameElements();
         if (isBlastActive) {
-            batch.draw(blastTexture, blastPosition.x, blastPosition.y, 100, 100);
+            batch.draw(blastTexture, 300, 20, 700, 300);
 
             blastTimer += delta;
             if (blastTimer >= 0.5f) {
@@ -845,7 +826,6 @@ public class Level1 extends Level implements Screen , InputProcessor {
                 for (Pig pig : activePigs) {
                     handleCollision(bird, pig);
                     if (bird instanceof Bombird && ((Bombird) bird).hasExploded) {
-                        drawExplosion(bird);
                         drawBlastEffect(bird.position.x, bird.position.y);
                     }
                     if (pig.isDestroyed) {
@@ -858,7 +838,6 @@ public class Level1 extends Level implements Screen , InputProcessor {
                 for (Obstacle obstacle : activeObstacles) {
                     handleCollision(bird, obstacle);
                     if (obstacle instanceof TNT && ((TNT) obstacle).hasExploded) {
-                        drawTNTExplosion(obstacle);
                         drawBlastEffect(bird.position.x, bird.position.y);
                     }
                     if (obstacle.isDestroyed || (obstacle instanceof TNT && ((TNT) obstacle).hasExploded)) {
@@ -879,24 +858,6 @@ public class Level1 extends Level implements Screen , InputProcessor {
         blastPosition.set(x, y);
         isBlastActive = true;
         blastTimer = 0f;
-    }
-
-    private void drawExplosion(Bird bird) {
-        batch.begin();
-        batch.draw(((Bombird) bird).blastTexture, bird.position.x, bird.position.y);
-        batch.end();
-    }
-
-    private void drawTNTExplosion(Obstacle obstacle) {
-        batch.begin();
-        if (obstacle.texture ==null){
-            obstacle.texture = new Texture("tnt.png");
-        }
-        if (((TNT)obstacle).blastTexture == null) {
-            ((TNT) obstacle).blastTexture = new Texture("blast.png");
-        }
-        batch.draw(((TNT) obstacle).blastTexture, obstacle.position.x, obstacle.position.y);
-        batch.end();
     }
 
     private void performCollisionCleanup(List<Bird> birdsToRemove, List<Pig> pigsToRemove, List<Obstacle> obstaclesToRemove) {
