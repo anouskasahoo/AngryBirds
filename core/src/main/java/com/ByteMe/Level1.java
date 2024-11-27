@@ -13,30 +13,40 @@ import com.badlogic.gdx.math.Vector2;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.*;
 
 public class Level1 extends Level implements Screen , InputProcessor {
 
-    private final Texture slingshot2;
-    private final Texture backgroundTexture;
+    private final transient Texture slingshot2 = new Texture("slingshot2.png");
+    private final transient Texture backgroundTexture = new Texture("Level1_bg.png");
     private final Player player;
     private final MainLauncher game;
     private Vector2 initialPosition;
-    private ShapeRenderer shapeRenderer;
+    private transient ShapeRenderer shapeRenderer = new ShapeRenderer();
     private Vector2 initialSlingshotPosition;
     private Set<Vector2> occupiedPositions;
+    private boolean load;
+//    private transient ArrayList<Bird> activeBirds;
+//    private transient ArrayList<Pig> activePigs;
+//    private transient ArrayList<Obstacle> activeObstacles;
 
 
-    public Level1(MainLauncher game, Player player) {
+    public Level1(MainLauncher game, Player player, boolean load) {
         super(game, "slingshot1.png", 100, 70, 50, 150, player);
-        slingshot2 = new Texture("slingshot2.png");
-        backgroundTexture = new Texture("Level1_bg.png");
+        this.levelNumber = 1;
+        //slingshot2 = new Texture("slingshot2.png");
+        //backgroundTexture = new Texture("Level1_bg.png");
         this.player = player;
         this.game = game;
-        shapeRenderer = new ShapeRenderer();
+        //shapeRenderer = new ShapeRenderer();
         this.initialSlingshotPosition = new Vector2(slingshot.position.get(0), slingshot.position.get(1));
+        this.load = load;
+//        List<Bird> activeBirds = new ArrayList<>(birds);
+//        List<Pig> activePigs = new ArrayList<>(pigs);
+//        List<Obstacle> activeObstacles = new ArrayList<>(obstacles);
 
-        if (player.getLoadedGame()==null||player.getLoadedGame().getLevel() instanceof Level1) {
+        if (!load) {
             // Initialize birds
             birds = new ArrayList<>();
             Bombird b1 = new Bombird();
@@ -80,23 +90,32 @@ public class Level1 extends Level implements Screen , InputProcessor {
             obstacles.add(new Stone(new Vector2(672, 115), Stone.Orientation.HORIZONTAL));
             obstacles.add(new Stone(new Vector2(720, 115), Stone.Orientation.VERTICAL));
             obstacles.add(new Stone(new Vector2(760, 115), Stone.Orientation.VERTICAL));
+            activeBirds.addAll(birds);
+            activePigs.addAll(pigs);
+            activeObstacles.addAll(obstacles);
         }
         else{
-            //birds.addAll(player.getLoadedGame().birds);
-            //obstacles.addAll(player.getLoadedGame().obstacles);
-            //pigs.addAll(player.getLoadedGame().pigs);
-            /*
-            GameState gameState = null;
+            birds.addAll(player.getLoadedGame().getLevel().activeBirds);
+            obstacles.addAll(player.getLoadedGame().getLevel().obstacles);
+            pigs.addAll(player.getLoadedGame().getLevel().activePigs);
 
-            try (FileInputStream fileIn = new FileInputStream();
-                 ObjectInputStream in = new ObjectInputStream(fileIn)) {
-                gameState = (GameState) in.readObject();  // Deserialize the GameState object
-                System.out.println("Game state has been loaded from " + fileName);
-            } catch (IOException | ClassNotFoundException e) {
-                System.err.println("Error loading game state: " + e.getMessage());
-            }
-             */
-
+//            try (FileInputStream fileIn = new FileInputStream("saved.ser");
+//                ObjectInputStream in = new ObjectInputStream(fileIn)) {
+//                GameState gameState = (GameState) in.readObject();
+//                player.setLoadedGame(gameState);
+//                System.out.println("Game state loaded from saved.ser");
+//                System.out.println(gameState.getLevel().levelNumber);
+//
+//            } catch (IOException | ClassNotFoundException e) {
+//                System.err.println("Error loading game: " + e.getMessage());
+//            }
+//            activeBirds = new ArrayList<>(birds);
+//            activePigs = new ArrayList<>(pigs);
+//            activeObstacles = new ArrayList<>(obstacles);
+            activeBirds.addAll(birds);
+            activePigs.addAll(pigs);
+            activeObstacles.addAll(obstacles);
+//
         }
     }
 
@@ -558,6 +577,17 @@ public class Level1 extends Level implements Screen , InputProcessor {
 
     private void drawBirds() {
         for (Bird bird : birds) {
+            if (bird.texture==null){
+                if (bird instanceof Bombird){
+                    bird.texture = new Texture("bombird.png");
+                }
+                else if (bird instanceof ClassicBird){
+                    bird.texture = new Texture("classicBird.png");
+                }
+                else{
+                    bird.texture = new Texture("teleBird.png");
+                }
+            }
             batch.draw(bird.texture, bird.position.x, bird.position.y,
                 bird.size.get(0), bird.size.get(1));
         }
@@ -565,12 +595,39 @@ public class Level1 extends Level implements Screen , InputProcessor {
 
     private void drawObstacles() {
         for (Obstacle obstacle : obstacles) {
+            if (obstacle.texture==null){
+                if (obstacle instanceof Stone){
+                    Stone stone = (Stone) obstacle;
+                    obstacle.texture = new Texture (stone.stoneOrientation == Stone.Orientation.HORIZONTAL ? "stone_horizontal.png" :
+                        (stone.stoneOrientation == Stone.Orientation.VERTICAL ? "stone_vertical.png" : "stone_hbox.png"));
+                }
+                else if (obstacle instanceof Wood){
+                    Wood wood = (Wood) obstacle;
+                    obstacle.texture = new Texture(wood.woodOrientation == Wood.Orientation.HORIZONTAL ? "wood_horizontal.png" :
+                        (wood.woodOrientation == Wood.Orientation.VERTICAL ? "wood_vertical.png" :
+                            (wood.woodOrientation == Wood.Orientation.DIAGONAL ? "wood_diagonal.png" : "wood_box.png")));
+                }
+                else{
+                    obstacle.texture = new Texture("tnt.png");
+                }
+            }
             obstacle.render(batch);
         }
     }
 
     private void drawPigs() {
         for (Pig pig : pigs) {
+            if (pig.texture==null){
+                if (pig instanceof ClassicPig){
+                    pig.texture = new Texture("ClassicPig.png");
+                }
+                else if (pig instanceof KingPig){
+                    pig.texture = new Texture("KingPig.png");
+                }
+                else{
+                    pig.texture = new Texture("PrettyPig.png");
+                }
+            }
             batch.draw(pig.texture, pig.position.x, pig.position.y,
                 pig.size.get(0), pig.size.get(1));
         }
@@ -654,9 +711,9 @@ public class Level1 extends Level implements Screen , InputProcessor {
 
     private void handleCollisions() {
         // Create safe copies of collections
-        List<Bird> activeBirds = new ArrayList<>(birds);
-        List<Pig> activePigs = new ArrayList<>(pigs);
-        List<Obstacle> activeObstacles = new ArrayList<>(obstacles);
+//        List<Bird> activeBirds = new ArrayList<>(birds);
+//        List<Pig> activePigs = new ArrayList<>(pigs);
+//        List<Obstacle> activeObstacles = new ArrayList<>(obstacles);
 
         // Tracking lists for removal
         List<Bird> birdsToRemove = new ArrayList<>();
@@ -664,7 +721,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
         List<Obstacle> obstaclesToRemove = new ArrayList<>();
 
         // Process flying birds using an iterator for safe removal
-        for (Bird bird : activeBirds) {
+        for (Bird bird : this.activeBirds) {
             if (bird != null && bird.isFlying) {
                 // Check collisions with pigs
                 for (Pig pig : activePigs) {
@@ -714,6 +771,12 @@ public class Level1 extends Level implements Screen , InputProcessor {
 
     private void drawTNTExplosion(Obstacle obstacle) {
         batch.begin();
+        if (obstacle.texture ==null){
+            obstacle.texture = new Texture("tnt.png");
+        }
+        if (((TNT)obstacle).blastTexture == null) {
+            ((TNT) obstacle).blastTexture = new Texture("blast.png");
+        }
         batch.draw(((TNT) obstacle).blastTexture, obstacle.position.x, obstacle.position.y);
         batch.end();
     }
@@ -880,5 +943,29 @@ public class Level1 extends Level implements Screen , InputProcessor {
         shapeRenderer.end();
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
+    }
+
+    public ArrayList<Bird> getActiveBirds() {
+        return activeBirds;
+    }
+
+    public void setActiveBirds(ArrayList<Bird> activeBirds) {
+        this.activeBirds = activeBirds;
+    }
+
+    public ArrayList<Pig> getActivePigs() {
+        return activePigs;
+    }
+
+    public void setActivePigs(ArrayList<Pig> activePigs) {
+        this.activePigs = activePigs;
+    }
+
+    public ArrayList<Obstacle> getActiveObstacles() {
+        return activeObstacles;
+    }
+
+    public void setActiveObstacles(ArrayList<Obstacle> activeObstacles) {
+        this.activeObstacles = activeObstacles;
     }
 }
