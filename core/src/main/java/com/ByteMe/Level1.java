@@ -10,10 +10,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
 import java.util.*;
 
 public class Level1 extends Level implements Screen , InputProcessor {
@@ -27,27 +23,21 @@ public class Level1 extends Level implements Screen , InputProcessor {
     private Vector2 initialSlingshotPosition;
     private Set<Vector2> occupiedPositions;
     private boolean load;
-//    private transient ArrayList<Bird> activeBirds;
-//    private transient ArrayList<Pig> activePigs;
-//    private transient ArrayList<Obstacle> activeObstacles;
+
 
 
     public Level1(MainLauncher game, Player player, boolean load, GameState gameState) {
         super(game, "slingshot1.png", 100, 70, 50, 150, player);
         this.levelNumber = 1;
-        //slingshot2 = new Texture("slingshot2.png");
-        //backgroundTexture = new Texture("Level1_bg.png");
+
         this.player = player;
         this.game = game;
-        //shapeRenderer = new ShapeRenderer();
+
         this.initialSlingshotPosition = new Vector2(slingshot.position.get(0), slingshot.position.get(1));
         this.load = load;
-//        List<Bird> activeBirds = new ArrayList<>(birds);
-//        List<Pig> activePigs = new ArrayList<>(pigs);
-//        List<Obstacle> activeObstacles = new ArrayList<>(obstacles);
 
         if (!load) {
-            // Initialize birds
+            // initializing birds
             birds = new ArrayList<>();
             ClassicBird b1 = new ClassicBird();
             b1.position.set(90, 160);
@@ -61,7 +51,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
             b3.position.set(0, 70);
             birds.add(b3);
 
-            //Initialize pigs
+            //initializing pigs
             pigs = new ArrayList<>();
             ClassicPig cp1 = new ClassicPig();
             cp1.position.set(600, 120);
@@ -71,6 +61,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
             cp2.position.set(692, 120);
             pigs.add(cp2);
 
+            //initializing obstacles
             obstacles.add(new TNT(new Vector2(600, 70)));
             obstacles.add(new TNT(new Vector2(690, 70)));
             obstacles.add(new Wood(new Vector2(645, 110), Wood.Orientation.HORIZONTAL));
@@ -84,23 +75,10 @@ public class Level1 extends Level implements Screen , InputProcessor {
             obstacles.addAll(player.getLoadedGame().getLevel().activeObstacles);
             pigs.addAll(player.getLoadedGame().getLevel().activePigs);
 
-//            try (FileInputStream fileIn = new FileInputStream("saved.ser");
-//                ObjectInputStream in = new ObjectInputStream(fileIn)) {
-//                GameState gameState = (GameState) in.readObject();
-//                player.setLoadedGame(gameState);
-//                System.out.println("Game state loaded from saved.ser");
-//                System.out.println(gameState.getLevel().levelNumber);
-//
-//            } catch (IOException | ClassNotFoundException e) {
-//                System.err.println("Error loading game: " + e.getMessage());
-//            }
-//            activeBirds = new ArrayList<>(birds);
-//            activePigs = new ArrayList<>(pigs);
-//            activeObstacles = new ArrayList<>(obstacles);
             activeBirds.addAll(birds);
             activePigs.addAll(pigs);
             activeObstacles.addAll(obstacles);
-//
+
         }
         else{
             birds.addAll(gameState.getLevel().activeBirds);
@@ -262,7 +240,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
     }
 
     private void applyGravityDamage(float destroyedX, float destroyedY) {
-        // Collect and process pigs first
+
         for (Pig pig : new ArrayList<>(pigs)) {
             if (isDirectlyAbove(pig.position.x, pig.position.y, destroyedX, destroyedY,
                 pig.size.get(0), pig.size.get(1))) {
@@ -271,7 +249,6 @@ public class Level1 extends Level implements Screen , InputProcessor {
             }
         }
 
-        // Then process obstacles
         for (Obstacle obstacle : new ArrayList<>(obstacles)) {
             if (isDirectlyAbove(obstacle.position.x, obstacle.position.y, destroyedX, destroyedY,
                 (int)obstacle.width, (int)obstacle.height)) {
@@ -287,16 +264,13 @@ public class Level1 extends Level implements Screen , InputProcessor {
         float step = Math.min(height, 10f);
         Vector2 newPosition = new Vector2(position);
 
-        // Precise fall with no overlap tolerance
         while (true) {
             Vector2 testPosition = new Vector2(newPosition.x, newPosition.y - step);
 
-            // Check if falling is impossible
             if (testPosition.y - height <= groundY) {
                 break;
             }
 
-            // Boundary checks
             if (testPosition.x < 0 ||
                 testPosition.x + width > 750 ||
                 testPosition.y < 0 ||
@@ -304,7 +278,6 @@ public class Level1 extends Level implements Screen , InputProcessor {
                 break;
             }
 
-            // Check for any overlap with ANY existing position
             boolean canFall = true;
             for (Vector2 occupiedPos : occupiedPositions) {
                 if (wouldOverlap(testPosition, width, height, occupiedPos, width, height)) {
@@ -313,30 +286,26 @@ public class Level1 extends Level implements Screen , InputProcessor {
                 }
             }
 
-            // If overlap detected, stop falling
             if (!canFall) {
                 break;
             }
 
-            // If no overlap, update position
             newPosition.set(testPosition);
         }
 
-        // Remove old position, update, and add new position
         occupiedPositions.remove(position);
         position.set(newPosition);
         occupiedPositions.add(newPosition);
 
-        // Resolve any remaining overlaps
         resolveOverlaps(position, width, height, occupiedPositions);
     }
 
     private boolean wouldOverlap(Vector2 pos1, float width1, float height1,
                                  Vector2 pos2, float width2, float height2) {
-        return !(pos1.x + width1 <= pos2.x ||   // Too far left
-            pos1.x >= pos2.x + width2 ||   // Too far right
-            pos1.y + height1 <= pos2.y ||  // Too far down
-            pos1.y >= pos2.y + height2);   // Too far up
+        return !(pos1.x + width1 <= pos2.x ||
+            pos1.x >= pos2.x + width2 ||
+            pos1.y + height1 <= pos2.y ||
+            pos1.y >= pos2.y + height2);
     }
 
     private boolean checkOverlap(Vector2 pos1, float width1, float height1,
@@ -348,14 +317,13 @@ public class Level1 extends Level implements Screen , InputProcessor {
     }
 
     private void resolveOverlaps(Vector2 position, float width, float height, Set<Vector2> occupiedPositions) {
-        // Additional pass to separate overlapping objects
+
         for (Vector2 occupiedPos : new ArrayList<>(occupiedPositions)) {
             if (checkOverlap(position, width, height, occupiedPos, width, height) &&
                 !position.equals(occupiedPos)) {
-                // Slightly adjust position to resolve overlap
+
                 float adjustmentX = (position.x < occupiedPos.x) ? -width : width;
 
-                // Boundary-aware adjustment
                 if (position.x + adjustmentX < 0) {
                     adjustmentX = -position.x;
                 }
@@ -373,7 +341,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
     }
 
     private boolean isDirectlyAbove(float x1, float y1, float x2, float y2, float width, float height) {
-        // More precise check for directly above objects
+
         return Math.abs(x1 - x2) <= width && y1 > y2;
     }
 
@@ -478,12 +446,10 @@ public class Level1 extends Level implements Screen , InputProcessor {
     private void initializeOccupiedPositions() {
         occupiedPositions = new HashSet<>();
 
-        // Add initial positions of all pigs
         for (Pig pig : pigs) {
             occupiedPositions.add(new Vector2(pig.position));
         }
 
-        // Add initial positions of all obstacles
         for (Obstacle obstacle : obstacles) {
             occupiedPositions.add(new Vector2(obstacle.position));
         }

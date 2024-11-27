@@ -30,12 +30,7 @@ public class PauseGame implements Screen, Serializable {
     public PauseGame(MainLauncher game, Player player, GameState gameState) {
         this.game=game;
         this.player = player;
-        //batch = new SpriteBatch();
         status = gameState.getLevel().levelNumber;
-        //bgtexture = new Texture("pause_bg.png");
-        //resumeButton = new Texture("resume_button.png");
-        //endButton = new Texture("endgame_button.png");
-        //saveButton = new Texture("savegame_button.png");
         this.gameState = gameState;
     }
 
@@ -133,55 +128,7 @@ public class PauseGame implements Screen, Serializable {
     public static void saveGame(GameState gameState, Player player) {
         player.setLoadedGame(gameState);
         System.out.println("Player's loaded game updated.");
-
-//        try (FileOutputStream fileOut = new FileOutputStream("saved.ser");
-//            ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-//            System.out.println("Save trying");
-//            //inspectForTextures(gameState, "gameState");
-//
-//            out.writeObject(players);
-//            for (Player p:players){
-//                System.out.println(p.name);
-//            }
-//            System.out.println("Game state saved to saved.ser");
-//
-//            System.out.println("Player's loaded game updated.");
-//        } catch (IOException e) {
-//            System.err.println("Error saving game: " + e.getMessage());
-//            e.printStackTrace();
-//        }
-    }
-/*
-    public static void inspectForTextures(Object obj, String path) {
-        if (obj == null) return;
-
-        Class<?> clazz = obj.getClass();
-        if (clazz == Texture.class) {
-            System.out.println("Found Texture at: " + path);
-            return;
-        }
-
-        if (clazz.isArray()) {
-            Object[] array = (Object[]) obj;
-            for (int i = 0; i < array.length; i++) {
-                inspectForTextures(array[i], path + "[" + i + "]");
-            }
-        } else if (obj instanceof Iterable) {
-            int index = 0;
-            for (Object item : (Iterable<?>) obj) {
-                inspectForTextures(item, path + "[" + index + "]");
-                index++;
-            }
-        } else {
-            for (Field field : clazz.getDeclaredFields()) {
-                field.setAccessible(true);
-                try {
-                    inspectForTextures(field.get(obj), path + "." + field.getName());
-                } catch (IllegalAccessException ignored) {}
-            }
-        }
     }
 
- */
 
 }
