@@ -6,6 +6,12 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+import static com.ByteMe.MainLauncher.players;
+
 public class HomeScreen implements Screen {
     private transient SpriteBatch batch;
     private transient Texture backgroundTexture;
@@ -59,6 +65,7 @@ public class HomeScreen implements Screen {
             float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             if (mouseX >= exit_x && mouseX <= exit_x+exit_width && mouseY >= exit_y && mouseY <= exit_y+exit_height) {
+                savePlayers();
                 Gdx.app.exit();
             }
             if (mouseX >= load_x && mouseX <= load_x+load_width && mouseY >= load_y && mouseY <= load_y+load_height) {
@@ -80,6 +87,23 @@ public class HomeScreen implements Screen {
         batch.draw(boardButton, board_x, board_y, board_width, board_height);
         batch.draw(playButton, play_x, play_y, play_width, play_height);
         batch.end();
+    }
+
+    private void savePlayers() {
+        try (FileOutputStream fileOut = new FileOutputStream("saved.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+            System.out.println("Save trying");
+            //inspectForTextures(gameState, "gameState");
+
+            out.writeObject(players);
+            for (Player p:players){
+                System.out.println(p.name);
+            }
+            System.out.println("Game state saved to saved.ser");
+        } catch (IOException e) {
+            System.err.println("Error saving game: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override

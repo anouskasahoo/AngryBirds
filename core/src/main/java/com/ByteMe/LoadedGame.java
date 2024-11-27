@@ -14,21 +14,52 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.Objects;
+
+import static com.ByteMe.MainLauncher.players;
 
 public class LoadedGame extends Level implements Screen {
     private transient Texture bgtexture;// Image for the background
     private Player player;
     private MainLauncher game;
-    private transient Texture playButton = new Texture("exit_yellow.png");
-    private transient Texture exitButton = new Texture("play_yellow.png");
+    private transient Texture playButton = new Texture("play_yellow.png");
+    private transient Texture exitButton = new Texture("exit_yellow.png");
 
-    private GameState gameState;
+    private GameState gameState = null;
 
     public LoadedGame(MainLauncher game, Player player) {
         super(game, "slingshot1.png", 100, 70, 50, 150, player);
         this.game = game;
         this.player = player;
-        gameState = player.getLoadedGame();
+        this.gameState = player.getLoadedGame();
+
+//        try (FileInputStream fileIn = new FileInputStream("saved.ser");
+//            ObjectInputStream in = new ObjectInputStream(fileIn)) {
+//            System.out.println("Before loading");
+//            for (Player p: players){
+//                System.out.println(p.name);
+//            }
+//            ArrayList<Player> loaded = (ArrayList<Player>) in.readObject();
+//              players.addAll(loaded);
+//            System.out.println("After loading");
+//            for (Player p: players){
+//                System.out.println(p.name);
+//            }
+//            for (Player p:loaded){
+//                if (Objects.equals(player.getName(), p.getName())){
+//                    gameState = p.getLoadedGame();
+//                    player = p;
+//                }
+//            }
+//
+//            //System.out.println("Game state loaded from saved.ser");
+//            //System.out.println(gameState.getLevel().levelNumber);
+//
+//        } catch (IOException | ClassNotFoundException e) {
+//            System.err.println("Error loading game: " + e.getMessage());
+//        }
+
+
         if (gameState == null){
             bgtexture = new Texture("no_loaded_bg.png");
             //this.exitButton = new Texture("exit_yellow.png");
@@ -38,16 +69,16 @@ public class LoadedGame extends Level implements Screen {
             bgtexture = new Texture("yes_loaded_bg.png");
             //this.exitButton = new Texture("exit_yellow.png");
             //this.playButton = new Texture("play_yellow.png");
-            try (FileInputStream fileIn = new FileInputStream("saved.ser");
-                ObjectInputStream in = new ObjectInputStream(fileIn)) {
-                gameState = (GameState) in.readObject();
-                player.setLoadedGame(gameState);
-                System.out.println("Game state loaded from saved.ser");
-                System.out.println(gameState.getLevel().levelNumber);
-
-            } catch (IOException | ClassNotFoundException e) {
-                System.err.println("Error loading game: " + e.getMessage());
-            }
+//            try (FileInputStream fileIn = new FileInputStream("saved.ser");
+//                ObjectInputStream in = new ObjectInputStream(fileIn)) {
+//                gameState = (GameState) in.readObject();
+//                player.setLoadedGame(gameState);
+//                System.out.println("Game state loaded from saved.ser");
+//                System.out.println(gameState.getLevel().levelNumber);
+//
+//            } catch (IOException | ClassNotFoundException e) {
+//                System.err.println("Error loading game: " + e.getMessage());
+//            }
             switch (gameState.getLevel().levelNumber){
                 case 1:
                     game.setScreen(new Level1(game, player, true, null));
