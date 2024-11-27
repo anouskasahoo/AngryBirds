@@ -9,31 +9,39 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-
 import java.util.*;
 
 public class NewLevel2 extends Level implements Screen , InputProcessor {
 
-    private final Texture slingshot2;
-    private final Texture backgroundTexture;
+    private final transient Texture slingshot2 = new Texture("slingshot2.png");
+    private final transient Texture backgroundTexture = new Texture("L2.png");
     private final Player player;
     private final MainLauncher game;
     private Vector2 initialPosition;
-    private ShapeRenderer shapeRenderer;
+    private transient ShapeRenderer shapeRenderer = new ShapeRenderer();
     private Vector2 initialSlingshotPosition;
     private Set<Vector2> occupiedPositions;
+    private boolean load;
+//    private transient ArrayList<Bird> activeBirds;
+//    private transient ArrayList<Pig> activePigs;
+//    private transient ArrayList<Obstacle> activeObstacles;
 
-    public NewLevel2(MainLauncher game, Player player) {
+
+    public NewLevel2(MainLauncher game, Player player, boolean load, GameState gameState) {
         super(game, "slingshot1.png", 100, 70, 50, 150, player);
+        this.levelNumber = 2;
+        //slingshot2 = new Texture("slingshot2.png");
+        //backgroundTexture = new Texture("Level1_bg.png");
         this.player = player;
         this.game = game;
-        shapeRenderer = new ShapeRenderer();
+        //shapeRenderer = new ShapeRenderer();
         this.initialSlingshotPosition = new Vector2(slingshot.position.get(0), slingshot.position.get(1));
-        slingshot2 = new Texture("slingshot2.png");
-        backgroundTexture = new Texture("L2.png");
-        this.levelNumber = 2;
+        this.load = load;
+//        List<Bird> activeBirds = new ArrayList<>(birds);
+//        List<Pig> activePigs = new ArrayList<>(pigs);
+//        List<Obstacle> activeObstacles = new ArrayList<>(obstacles);
 
-        if (player.getLoadedGame()==null||player.getLoadedGame().getLevel() instanceof Level1) {
+        if (!load) {
             // Initialize birds
             birds = new ArrayList<>();
             Bombird b1 = new Bombird();
@@ -68,6 +76,40 @@ public class NewLevel2 extends Level implements Screen , InputProcessor {
             obstacles.add(new Wood(new Vector2(555, 115), Wood.Orientation.HORIZONTAL));
             obstacles.add(new Wood(new Vector2(555, 70), Wood.Orientation.VERTICAL));
             obstacles.add(new Wood(new Vector2(600, 120), Wood.Orientation.BOX));
+            activeBirds.addAll(birds);
+            activePigs.addAll(pigs);
+            activeObstacles.addAll(obstacles);
+        }
+        else if (gameState == null){
+            birds.addAll(player.getLoadedGame().getLevel().activeBirds);
+            obstacles.addAll(player.getLoadedGame().getLevel().activeObstacles);
+            pigs.addAll(player.getLoadedGame().getLevel().activePigs);
+
+//            try (FileInputStream fileIn = new FileInputStream("saved.ser");
+//                ObjectInputStream in = new ObjectInputStream(fileIn)) {
+//                GameState gameState = (GameState) in.readObject();
+//                player.setLoadedGame(gameState);
+//                System.out.println("Game state loaded from saved.ser");
+//                System.out.println(gameState.getLevel().levelNumber);
+//
+//            } catch (IOException | ClassNotFoundException e) {
+//                System.err.println("Error loading game: " + e.getMessage());
+//            }
+//            activeBirds = new ArrayList<>(birds);
+//            activePigs = new ArrayList<>(pigs);
+//            activeObstacles = new ArrayList<>(obstacles);
+            activeBirds.addAll(birds);
+            activePigs.addAll(pigs);
+            activeObstacles.addAll(obstacles);
+//
+        }
+        else{
+            birds.addAll(gameState.getLevel().activeBirds);
+            obstacles.addAll(gameState.getLevel().activeObstacles);
+            pigs.addAll(gameState.getLevel().activePigs);
+            activeBirds.addAll(birds);
+            activePigs.addAll(pigs);
+            activeObstacles.addAll(obstacles);
         }
     }
 
@@ -211,7 +253,6 @@ public class NewLevel2 extends Level implements Screen , InputProcessor {
             bird.position.x + bird.size.get(0) > pig.position.x &&
             bird.position.y < pig.position.y + pig.size.get(1) &&
             bird.position.y + bird.size.get(1) > pig.position.y;
-
     }
 
     private boolean checkCollision(Bird bird, Obstacle obstacle) {
@@ -449,6 +490,58 @@ public class NewLevel2 extends Level implements Screen , InputProcessor {
         }
     }
 
+    private Vector2 findUniquePosition(Vector2 currentPos, Set<Vector2> occupiedPositions, Integer objectWidth, Integer objectHeight) {
+        Vector2 newPos = new Vector2(currentPos);
+        int attempts = 0;
+        int maxAttempts = 200; // Increased attempts
+
+        while (attempts < maxAttempts) {
+            // Check if the new position conflicts with any existing positions
+            boolean positionConflicts = occupiedPositions.stream()
+                .anyMatch(existingPos -> isOverlapping(newPos, existingPos, objectWidth, objectHeight));
+
+            if (!positionConflicts) {
+                // If no conflict, add the position and return it
+                occupiedPositions.add(newPos);
+                return newPos;
+            }
+
+            // Try different strategies to find a unique position
+            if (attempts < 50) {
+                // Incrementally move position
+                newPos.x += 20 + (attempts * 5);
+                newPos.y += 20 + (attempts * 5);
+            } else {
+                // More random repositioning in a wider area
+                newPos.x = 600 + (int)(Math.random() * 200);
+                newPos.y = 70 + (int)(Math.random() * 200);
+            }
+
+            // Ensure position stays within reasonable game bounds
+            newPos.x = Math.max(500, Math.min(newPos.x, 800));
+            newPos.y = Math.max(50, Math.min(newPos.y, 250));
+
+            attempts++;
+        }
+
+        // Fallback with guaranteed unique position
+        newPos.set(
+            600 + (int)(Math.random() * 200),
+            70 + (int)(Math.random() * 200)
+        );
+        occupiedPositions.add(newPos);
+        return newPos;
+    }
+
+    // Helper method to check for precise object overlap
+    private boolean isOverlapping(Vector2 newPos, Vector2 existingPos, float width, float height) {
+        return !(newPos.x + width < existingPos.x ||
+            newPos.x > existingPos.x + width ||
+            newPos.y + height < existingPos.y ||
+            newPos.y > existingPos.y + height);
+    }
+
+    // Modified methods
     private void handleCollision(Bird bird, Pig pig) {
         if (checkCollision(bird, pig)) {
             pig.takeDamage(bird.damage);
@@ -603,6 +696,17 @@ public class NewLevel2 extends Level implements Screen , InputProcessor {
 
     private void drawBirds() {
         for (Bird bird : birds) {
+            if (bird.texture==null){
+                if (bird instanceof Bombird){
+                    bird.texture = new Texture("bombird.png");
+                }
+                else if (bird instanceof ClassicBird){
+                    bird.texture = new Texture("classicBird.png");
+                }
+                else{
+                    bird.texture = new Texture("teleBird.png");
+                }
+            }
             batch.draw(bird.texture, bird.position.x, bird.position.y,
                 bird.size.get(0), bird.size.get(1));
         }
@@ -610,12 +714,39 @@ public class NewLevel2 extends Level implements Screen , InputProcessor {
 
     private void drawObstacles() {
         for (Obstacle obstacle : obstacles) {
+            if (obstacle.texture==null){
+                if (obstacle instanceof Stone){
+                    Stone stone = (Stone) obstacle;
+                    obstacle.texture = new Texture (stone.stoneOrientation == Stone.Orientation.HORIZONTAL ? "stone_horizontal.png" :
+                        (stone.stoneOrientation == Stone.Orientation.VERTICAL ? "stone_vertical.png" : "stone_hbox.png"));
+                }
+                else if (obstacle instanceof Wood){
+                    Wood wood = (Wood) obstacle;
+                    obstacle.texture = new Texture(wood.woodOrientation == Wood.Orientation.HORIZONTAL ? "wood_horizontal.png" :
+                        (wood.woodOrientation == Wood.Orientation.VERTICAL ? "wood_vertical.png" :
+                            (wood.woodOrientation == Wood.Orientation.DIAGONAL ? "wood_diagonal.png" : "wood_box.png")));
+                }
+                else{
+                    obstacle.texture = new Texture("tnt.png");
+                }
+            }
             obstacle.render(batch);
         }
     }
 
     private void drawPigs() {
         for (Pig pig : pigs) {
+            if (pig.texture==null){
+                if (pig instanceof ClassicPig){
+                    pig.texture = new Texture("ClassicPig.png");
+                }
+                else if (pig instanceof KingPig){
+                    pig.texture = new Texture("KingPig.png");
+                }
+                else{
+                    pig.texture = new Texture("PrettyPig.png");
+                }
+            }
             batch.draw(pig.texture, pig.position.x, pig.position.y,
                 pig.size.get(0), pig.size.get(1));
         }
@@ -699,9 +830,9 @@ public class NewLevel2 extends Level implements Screen , InputProcessor {
 
     private void handleCollisions() {
         // Create safe copies of collections
-        List<Bird> activeBirds = new ArrayList<>(birds);
-        List<Pig> activePigs = new ArrayList<>(pigs);
-        List<Obstacle> activeObstacles = new ArrayList<>(obstacles);
+//        List<Bird> activeBirds = new ArrayList<>(birds);
+//        List<Pig> activePigs = new ArrayList<>(pigs);
+//        List<Obstacle> activeObstacles = new ArrayList<>(obstacles);
 
         // Tracking lists for removal
         List<Bird> birdsToRemove = new ArrayList<>();
@@ -709,13 +840,12 @@ public class NewLevel2 extends Level implements Screen , InputProcessor {
         List<Obstacle> obstaclesToRemove = new ArrayList<>();
 
         // Process flying birds using an iterator for safe removal
-        for (Bird bird : activeBirds) {
+        for (Bird bird : this.activeBirds) {
             if (bird != null && bird.isFlying) {
                 // Check collisions with pigs
                 for (Pig pig : activePigs) {
                     handleCollision(bird, pig);
                     if (bird instanceof Bombird && ((Bombird) bird).hasExploded) {
-                        //drawExplosion(bird);
                         drawBlastEffect(bird.position.x, bird.position.y);
                     }
                     if (pig.isDestroyed) {
@@ -728,7 +858,6 @@ public class NewLevel2 extends Level implements Screen , InputProcessor {
                 for (Obstacle obstacle : activeObstacles) {
                     handleCollision(bird, obstacle);
                     if (obstacle instanceof TNT && ((TNT) obstacle).hasExploded) {
-                        //drawTNTExplosion(obstacle);
                         drawBlastEffect(bird.position.x, bird.position.y);
                     }
                     if (obstacle.isDestroyed || (obstacle instanceof TNT && ((TNT) obstacle).hasExploded)) {
@@ -774,6 +903,7 @@ public class NewLevel2 extends Level implements Screen , InputProcessor {
     private void checkGameConditions() {
         if (pigs.isEmpty()) {
             game.setScreen(new Win(game, player));
+            return;
         }
 
         if (birds.isEmpty()) {
@@ -789,6 +919,7 @@ public class NewLevel2 extends Level implements Screen , InputProcessor {
             // Only transition to lose screen if no birds are in flight
             if (!birdInFlight) {
                 game.setScreen(new Loss(game, 1, player));
+                return;
             }
         }
     }
@@ -912,5 +1043,28 @@ public class NewLevel2 extends Level implements Screen , InputProcessor {
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
     }
-}
 
+    public ArrayList<Bird> getActiveBirds() {
+        return activeBirds;
+    }
+
+    public void setActiveBirds(ArrayList<Bird> activeBirds) {
+        this.activeBirds = activeBirds;
+    }
+
+    public ArrayList<Pig> getActivePigs() {
+        return activePigs;
+    }
+
+    public void setActivePigs(ArrayList<Pig> activePigs) {
+        this.activePigs = activePigs;
+    }
+
+    public ArrayList<Obstacle> getActiveObstacles() {
+        return activeObstacles;
+    }
+
+    public void setActiveObstacles(ArrayList<Obstacle> activeObstacles) {
+        this.activeObstacles = activeObstacles;
+    }
+}

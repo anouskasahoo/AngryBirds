@@ -55,6 +55,21 @@ public class LevelsScreen implements Screen {
         int level3_w = 60;
         int level3_h = 375;
 
+        int level4_x = 525;
+        int level4_y = 50;
+        int level4_w = 60;
+        int level4_h = 375;
+
+        int level5_x = 608;
+        int level5_y = 50;
+        int level5_w = 60;
+        int level5_h = 375;
+
+        int level6_x = 690;
+        int level6_y = 50;
+        int level6_w = 60;
+        int level6_h = 375;
+
         int back_x = 10;
         int back_y = 400;
         int back_width = 80;
@@ -72,6 +87,18 @@ public class LevelsScreen implements Screen {
             }
             if (mouseX >= level3_x && mouseX <= level3_x+level3_w&& mouseY >= level3_y && mouseY <= level3_y+level3_h) {
                 game.setScreen(new HandScreen(game,3, player));
+            }
+            if (mouseX >= level4_x && mouseX <= level4_x+level4_w&& mouseY >= level4_y && mouseY <= level4_y+level4_h) {
+                //game.setScreen(new HandScreen(game,4, player));
+                game.setScreen(new NewLevel4(game, player, false, null));
+            }
+            if (mouseX >= level5_x && mouseX <= level5_x+level5_w&& mouseY >= level5_y && mouseY <= level5_y+level5_h) {
+                //game.setScreen(new HandScreen(game,5, player));
+                game.setScreen(new NewLevel5(game, player, false, null));
+            }
+            if (mouseX >= level6_x && mouseX <= level6_x+level6_w&& mouseY >= level6_y && mouseY <= level6_y+level6_h) {
+                //game.setScreen(new HandScreen(game,6, player));
+                game.setScreen(new NewLevel6(game, player, false, null));
             }
             if (mouseX >= back_x && mouseX <= back_x+back_width && mouseY >= back_y && mouseY <= back_y+back_height) {
                 game.setScreen(new HomeScreen(game, player));
