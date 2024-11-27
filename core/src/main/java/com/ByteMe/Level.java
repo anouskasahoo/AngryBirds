@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -66,6 +67,9 @@ public abstract class Level implements Serializable {
     protected int score;
     protected GameState gameState;
     protected int levelNumber;
+    protected ArrayList<Bird> activeBirds;
+    protected ArrayList<Pig> activePigs;
+    protected ArrayList<Obstacle> activeObstacles;
 
     public Level(MainLauncher game, String t, int p1, int p2, int s1, int s2, Player player) {
         this.game = game;
