@@ -25,11 +25,11 @@ public class PauseGame implements Screen, Serializable {
     private int status;
     private GameState gameState;
 
-    public PauseGame(MainLauncher game, int i, Player player, GameState gameState) {
+    public PauseGame(MainLauncher game, Player player, GameState gameState) {
         this.game=game;
         this.player = player;
         //batch = new SpriteBatch();
-        status = i;
+        status = gameState.getLevel().levelNumber;
         //bgtexture = new Texture("pause_bg.png");
         //resumeButton = new Texture("resume_button.png");
         //endButton = new Texture("endgame_button.png");
@@ -65,13 +65,12 @@ public class PauseGame implements Screen, Serializable {
             float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             if (mouseX >= resume_x && mouseX <= resume_x+resume_width && mouseY >= resume_y && mouseY <= resume_y+resume_height) {
-                /*
                 switch (status){
                     case 0:
                         //game.setScreen(new LoadedGame(game, player));
                         break;
                     case 1:
-                        game.setScreen(new Level1(game, player));
+                        game.setScreen(new Level1(game, player,true, gameState));
                         break;
                     case 2:
                         //game.setScreen(new Level2(game, player));
@@ -80,7 +79,6 @@ public class PauseGame implements Screen, Serializable {
                         //game.setScreen(new Level3(game, player));
                         break;
                 }
-                 */
                 //resume
             }
             if (mouseX >= save_x && mouseX <= save_x+save_width && mouseY >= save_y && mouseY <= save_y+save_height) {

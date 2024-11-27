@@ -53,7 +53,7 @@ public class Loss implements Screen {
             if (mouseX >= restart_x && mouseX <= restart_x+restart_width && mouseY >= restart_y && mouseY <= restart_y+restart_height) {
                 switch (status){
                     case 1:
-                        game.setScreen(new Level1(game, player,false));
+                        game.setScreen(new Level1(game, player,false, null));
                         break;
                     case 2:
                         //game.setScreen(new Level2(game, player));
