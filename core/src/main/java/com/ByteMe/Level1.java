@@ -96,7 +96,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
         }
         else{
             birds.addAll(player.getLoadedGame().getLevel().activeBirds);
-            obstacles.addAll(player.getLoadedGame().getLevel().obstacles);
+            obstacles.addAll(player.getLoadedGame().getLevel().activeObstacles);
             pigs.addAll(player.getLoadedGame().getLevel().activePigs);
 
 //            try (FileInputStream fileIn = new FileInputStream("saved.ser");

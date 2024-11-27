@@ -23,10 +23,10 @@ public abstract class Level implements Serializable {
     private static final long serialVersionUID = 1L;
 
     protected final MainLauncher game;
-    protected final SpriteBatch batch;
-    protected final Texture pauseButton;
-    protected final Texture winButton;
-    protected final Texture lossButton;
+    protected transient SpriteBatch batch = new SpriteBatch();
+    protected transient Texture pauseButton = new Texture("pausebutton.png");
+    protected transient Texture winButton = new Texture("win.png");
+    protected transient Texture lossButton  = new Texture("loss.png");
     protected final Slingshot slingshot;
     protected ArrayList<Bird> birds;
     protected ArrayList<Pig> pigs;
@@ -49,41 +49,49 @@ public abstract class Level implements Serializable {
     protected boolean explosionActive = false; // To track if an explosion is active
     protected float explosionDuration = 1f; // Duration for which the explosion is visible
     protected float explosionTimer = 0f; // Timer to track how long the explosion has been active
-    Texture explosionTexture = new Texture("blast.png");
+    //Texture explosionTexture = new Texture("blast.png");
     protected boolean isDragging = false;
-    protected final Texture bandTexture;
+    protected transient Texture bandTexture = new Texture("band.png");
     protected final Vector2 anchorBack;  // Behind the bird
     protected final Vector2 anchorFront;// In front of the bird// Tracks if the bird is being dragged
-    protected ShapeRenderer shapeRenderer;
-    protected Texture backgroundTexture;
-    protected Texture slingshot2;
+    protected transient ShapeRenderer shapeRenderer = new ShapeRenderer();
+    protected transient Texture backgroundTexture;
+    protected transient Texture slingshot2;
     private Vector2 initialSlingshotPosition;
     private final Player player;
-    protected Texture blastTexture;
+    protected transient Texture blastTexture = new Texture("blast.png");
     protected float blastTimer = 0f;
     protected Vector2 blastPosition = new Vector2();
     protected boolean isBlastActive = false;
     protected int score;
     protected GameState gameState;
+    protected int levelNumber;
+    protected ArrayList<Bird> activeBirds;
+    protected ArrayList<Pig> activePigs;
+    protected ArrayList<Obstacle> activeObstacles;
 
     public Level(MainLauncher game, String t, int p1, int p2, int s1, int s2, Player player) {
         this.game = game;
-        this.batch = new SpriteBatch();
+        //this.batch = new SpriteBatch();
         this.slingshot = new Slingshot(t,p1,p2,s1,s2);
         this.birds = new ArrayList<>();
-        this.pauseButton = new Texture("pausebutton.png");
-        this.winButton = new Texture("win.png");
-        this.lossButton = new Texture("loss.png");
+        //this.pauseButton = new Texture("pausebutton.png");
+        //this.winButton = new Texture("win.png");
+        //this.lossButton = new Texture("loss.png");
         this.obstacles = new ArrayList<>();
-        bandTexture = new Texture("band.png");
+        this.pigs = new ArrayList<>();
+        //bandTexture = new Texture("band.png");
         anchorBack = new Vector2(slingshot.position.get(0) + 20, slingshot.position.get(1) + 130);
         anchorFront = new Vector2(slingshot.position.get(0) + 55, slingshot.position.get(1) + 130);
-        shapeRenderer = new ShapeRenderer();
+        //shapeRenderer = new ShapeRenderer();
         this.initialSlingshotPosition = new Vector2(slingshot.position.get(0), slingshot.position.get(1));
         this.player = player;
-        blastTexture = new Texture("blast.png");
+        //blastTexture = new Texture("blast.png");
         this.score = 0;
         this.gameState = new GameState(this, this.score, player);
+        this.activeBirds = new ArrayList<>();
+        this.activeObstacles = new ArrayList<>();
+        this.activePigs = new ArrayList<>();
     }
 
     public void dispose() {
@@ -100,6 +108,16 @@ public abstract class Level implements Serializable {
                 bird.texture.dispose(); // Dispose each bird's texture
             }
         }
+    }
+
+    public void loadAfterDeser(){
+        this.batch = new SpriteBatch();
+        this.pauseButton = new Texture("pausebutton.png");
+        this.winButton = new Texture("win.png");
+        this.lossButton = new Texture("loss.png");
+        this.bandTexture = new Texture("band.png");
+        shapeRenderer = new ShapeRenderer();
+        blastTexture = new Texture("blast.png");
     }
 
 

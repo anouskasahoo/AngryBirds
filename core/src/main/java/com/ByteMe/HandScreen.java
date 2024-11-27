@@ -9,10 +9,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import static com.ByteMe.MainLauncher.levelsBg;
 
 public class HandScreen implements Screen {
-    private SpriteBatch batch;
-    private Texture bgtexture;
-    private Texture backButton;
-    private Texture playButton;
+    private transient SpriteBatch batch = new SpriteBatch();
+    private transient Texture bgtexture;
+    private transient Texture backButton = new Texture("backbutton.png");
+    private transient Texture playButton = new Texture("PlayButton.png");
     private MainLauncher game;
     private int level;
     private final Player player;
@@ -21,10 +21,10 @@ public class HandScreen implements Screen {
         this.game=game;
         this.player = player;
         this.level=level;
-        batch = new SpriteBatch();
+        //batch = new SpriteBatch();
         bgtexture = new Texture(levelsBg.get(level));
-        backButton = new Texture("backbutton.png");
-        playButton = new Texture("PlayButton.png");
+        //backButton = new Texture("backbutton.png");
+        //playButton = new Texture("PlayButton.png");
     }
 
     @Override
@@ -56,7 +56,7 @@ public class HandScreen implements Screen {
             if (mouseX >= play_x && mouseX <= play_x+play_width && mouseY >= play_y && mouseY <= play_y+play_height) {
                 switch(level) {
                     case 1:
-                        game.setScreen(new Level1(game, player));
+                        game.setScreen(new Level1(game, player, false));
                         break;
                     case 2:
                         //game.setScreen(new Level2(game, player));
@@ -98,5 +98,9 @@ public class HandScreen implements Screen {
     @Override
     public void dispose() {
 
+    }
+
+    public void loadAfterDeser(){
+        bgtexture = new Texture(levelsBg.get(level));
     }
 }

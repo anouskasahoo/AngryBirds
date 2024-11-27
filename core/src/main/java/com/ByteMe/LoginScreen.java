@@ -13,9 +13,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 public class LoginScreen implements Screen {
     private final MainLauncher game;
     private final SpriteBatch batch;
-    private final Texture backgroundTexture;
-    private final Texture exitButton;
-    private final Texture playButton;
+    private Texture backgroundTexture;
+    private Texture exitButton;
+    private Texture playButton;
     Player player;
     private Stage stage;
     private TextField playerNameField;
@@ -125,4 +125,11 @@ public class LoginScreen implements Screen {
         stage.dispose();
         skin.dispose();
     }
+
+//    public void loadAfterDeser(){
+//        backgroundTexture = new Texture("login.png");
+//        exitButton = new Texture("ExitButton.png");
+//        playButton = new Texture("PlayButton.png");
+//        popupTexture = new Texture("popup.png");
+//    }
 }

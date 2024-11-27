@@ -3,6 +3,7 @@ package com.ByteMe;
 import com.badlogic.gdx.math.Vector2;
 
 public class Stone extends Obstacle{
+
     public enum Orientation {
         HORIZONTAL,
         VERTICAL,
@@ -18,5 +19,6 @@ public class Stone extends Obstacle{
             orientation == Orientation.HORIZONTAL ? 10 : 50,
             6 // 6 health
         );
+        this.stoneOrientation = orientation;
     }
 }
