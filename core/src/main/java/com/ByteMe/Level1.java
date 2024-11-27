@@ -13,30 +13,40 @@ import com.badlogic.gdx.math.Vector2;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.*;
 
 public class Level1 extends Level implements Screen , InputProcessor {
 
-    private final Texture slingshot2;
-    private final Texture backgroundTexture;
+    private final transient Texture slingshot2 = new Texture("slingshot2.png");
+    private final transient Texture backgroundTexture = new Texture("Level1_bg.png");
     private final Player player;
     private final MainLauncher game;
     private Vector2 initialPosition;
-    private ShapeRenderer shapeRenderer;
+    private transient ShapeRenderer shapeRenderer = new ShapeRenderer();
     private Vector2 initialSlingshotPosition;
     private Set<Vector2> occupiedPositions;
+    private boolean load;
+//    private transient ArrayList<Bird> activeBirds;
+//    private transient ArrayList<Pig> activePigs;
+//    private transient ArrayList<Obstacle> activeObstacles;
 
-    public Level1(MainLauncher game, Player player) {
+
+    public Level1(MainLauncher game, Player player, boolean load) {
         super(game, "slingshot1.png", 100, 70, 50, 150, player);
+        this.levelNumber = 1;
+        //slingshot2 = new Texture("slingshot2.png");
+        //backgroundTexture = new Texture("Level1_bg.png");
         this.player = player;
         this.game = game;
-        shapeRenderer = new ShapeRenderer();
+        //shapeRenderer = new ShapeRenderer();
         this.initialSlingshotPosition = new Vector2(slingshot.position.get(0), slingshot.position.get(1));
-        slingshot2 = new Texture("slingshot2.png");
-        backgroundTexture = new Texture("Level1_bg.png");
-        this.levelNumber = 1;
+        this.load = load;
+//        List<Bird> activeBirds = new ArrayList<>(birds);
+//        List<Pig> activePigs = new ArrayList<>(pigs);
+//        List<Obstacle> activeObstacles = new ArrayList<>(obstacles);
 
-        if (player.getLoadedGame()==null||player.getLoadedGame().getLevel() instanceof Level1) {
+        if (!load) {
             // Initialize birds
             birds = new ArrayList<>();
             Bombird b1 = new Bombird();
@@ -80,23 +90,32 @@ public class Level1 extends Level implements Screen , InputProcessor {
             obstacles.add(new Stone(new Vector2(672, 115), Stone.Orientation.HORIZONTAL));
             obstacles.add(new Stone(new Vector2(720, 115), Stone.Orientation.VERTICAL));
             obstacles.add(new Stone(new Vector2(760, 115), Stone.Orientation.VERTICAL));
+            activeBirds.addAll(birds);
+            activePigs.addAll(pigs);
+            activeObstacles.addAll(obstacles);
         }
         else{
-            //birds.addAll(player.getLoadedGame().birds);
-            //obstacles.addAll(player.getLoadedGame().obstacles);
-            //pigs.addAll(player.getLoadedGame().pigs);
-            /*
-            GameState gameState = null;
+            birds.addAll(player.getLoadedGame().getLevel().activeBirds);
+            obstacles.addAll(player.getLoadedGame().getLevel().obstacles);
+            pigs.addAll(player.getLoadedGame().getLevel().activePigs);
 
-            try (FileInputStream fileIn = new FileInputStream();
-                 ObjectInputStream in = new ObjectInputStream(fileIn)) {
-                gameState = (GameState) in.readObject();  // Deserialize the GameState object
-                System.out.println("Game state has been loaded from " + fileName);
-            } catch (IOException | ClassNotFoundException e) {
-                System.err.println("Error loading game state: " + e.getMessage());
-            }
-             */
-
+//            try (FileInputStream fileIn = new FileInputStream("saved.ser");
+//                ObjectInputStream in = new ObjectInputStream(fileIn)) {
+//                GameState gameState = (GameState) in.readObject();
+//                player.setLoadedGame(gameState);
+//                System.out.println("Game state loaded from saved.ser");
+//                System.out.println(gameState.getLevel().levelNumber);
+//
+//            } catch (IOException | ClassNotFoundException e) {
+//                System.err.println("Error loading game: " + e.getMessage());
+//            }
+//            activeBirds = new ArrayList<>(birds);
+//            activePigs = new ArrayList<>(pigs);
+//            activeObstacles = new ArrayList<>(obstacles);
+            activeBirds.addAll(birds);
+            activePigs.addAll(pigs);
+            activeObstacles.addAll(obstacles);
+//
         }
     }
 
@@ -112,7 +131,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
         batch.begin();
         drawGameElements();
         if (isBlastActive) {
-            batch.draw(blastTexture, 300, 20, 700, 300);
+            batch.draw(blastTexture, blastPosition.x, blastPosition.y, 100, 100);
 
             blastTimer += delta;
             if (blastTimer >= 0.5f) {
@@ -250,172 +269,47 @@ public class Level1 extends Level implements Screen , InputProcessor {
     }
 
     private void applyGravityDamage(float destroyedX, float destroyedY) {
-        // Collect and process pigs first
-        for (Pig pig : new ArrayList<>(pigs)) {
-            if (isDirectlyAbove(pig.position.x, pig.position.y, destroyedX, destroyedY,
-                pig.size.get(0), pig.size.get(1))) {
+        for (Pig pig : pigs) {
+            if (isAbove(pig.position.x, pig.position.y, destroyedX, destroyedY)) {
                 pig.takeDamage(1);
-                applyGravityFall(pig, destroyedY, pig.size.get(0), pig.size.get(1), occupiedPositions);
+                pig.position.set(destroyedX, destroyedY);
+                findUniquePosition(pig.position, occupiedPositions,pig.size.get(0), pig.size.get(1));
+                applyGravityEffect(pig.position, 70, occupiedPositions);
             }
         }
 
-        // Then process obstacles
-        for (Obstacle obstacle : new ArrayList<>(obstacles)) {
-            if (isDirectlyAbove(obstacle.position.x, obstacle.position.y, destroyedX, destroyedY,
-                (int)obstacle.width, (int)obstacle.height)) {
+        for (Obstacle obstacle : obstacles) {
+            if (isAbove(obstacle.position.x, obstacle.position.y, destroyedX, destroyedY)) {
                 obstacle.takeDamage(1);
-                applyGravityFall(obstacle, destroyedY, (int)obstacle.width, (int)obstacle.height, occupiedPositions);
+                obstacle.position.set(destroyedX, destroyedY);
+                findUniquePosition(obstacle.position, occupiedPositions, (int) obstacle.width, (int) obstacle.height);
+                applyGravityEffect(obstacle.position, 70, occupiedPositions);
             }
         }
     }
-
-    private void applyGravityFall(Object entity, float groundY, float width, float height, Set<Vector2> occupiedPositions) {
-        Vector2 position = entity instanceof Pig ? ((Pig)entity).position : ((Obstacle)entity).position;
-
-        float step = Math.min(height, 10f);
+    private void applyGravityEffect(Vector2 position, float groundY, Set<Vector2> occupiedPositions) {
+        float step = 10f; // Distance to fall per step
         Vector2 newPosition = new Vector2(position);
 
-        // Precise fall with no overlap tolerance
-        while (true) {
-            Vector2 testPosition = new Vector2(newPosition.x, newPosition.y - step);
-
-            // Check if falling is impossible
-            if (testPosition.y - height <= groundY) {
-                break;
-            }
-
-            // Boundary checks
-            if (testPosition.x < 0 ||
-                testPosition.x + width > 750 ||
-                testPosition.y < 0 ||
-                testPosition.y + height > 100) {
-                break;
-            }
-
-            // Check for any overlap with ANY existing position
-            boolean canFall = true;
-            for (Vector2 occupiedPos : occupiedPositions) {
-                if (wouldOverlap(testPosition, width, height, occupiedPos, width, height)) {
-                    canFall = false;
-                    break;
-                }
-            }
-
-            // If overlap detected, stop falling
-            if (!canFall) {
-                break;
-            }
-
-            // If no overlap, update position
-            newPosition.set(testPosition);
+        while (newPosition.y > groundY && !occupiedPositions.contains(new Vector2(newPosition.x, newPosition.y - step))) {
+            newPosition.y -= step; // Simulate falling
         }
 
-        // Remove old position, update, and add new position
-        occupiedPositions.remove(position);
-        position.set(newPosition);
-        occupiedPositions.add(newPosition);
-
-        // Resolve any remaining overlaps
-        resolveOverlaps(position, width, height, occupiedPositions);
+        occupiedPositions.remove(position); // Remove old position
+        position.set(newPosition); // Update to new position
+        occupiedPositions.add(newPosition); // Mark new position as occupied
     }
 
-    private boolean wouldOverlap(Vector2 pos1, float width1, float height1,
-                                 Vector2 pos2, float width2, float height2) {
-        return !(pos1.x + width1 <= pos2.x ||   // Too far left
-            pos1.x >= pos2.x + width2 ||   // Too far right
-            pos1.y + height1 <= pos2.y ||  // Too far down
-            pos1.y >= pos2.y + height2);   // Too far up
-    }
 
-    private boolean checkOverlap(Vector2 pos1, float width1, float height1,
-                                 Vector2 pos2, float width2, float height2) {
-        return !(pos1.x + width1 <= pos2.x ||
-            pos1.x >= pos2.x + width2 ||
-            pos1.y + height1 <= pos2.y ||
-            pos1.y >= pos2.y + height2);
-    }
-
-    private void resolveOverlaps(Vector2 position, float width, float height, Set<Vector2> occupiedPositions) {
-        // Additional pass to separate overlapping objects
-        for (Vector2 occupiedPos : new ArrayList<>(occupiedPositions)) {
-            if (checkOverlap(position, width, height, occupiedPos, width, height) &&
-                !position.equals(occupiedPos)) {
-                // Slightly adjust position to resolve overlap
-                float adjustmentX = (position.x < occupiedPos.x) ? -width : width;
-
-                // Boundary-aware adjustment
-                if (position.x + adjustmentX < 0) {
-                    adjustmentX = -position.x;
-                }
-                if (position.x + width + adjustmentX > 750) {
-                    adjustmentX = 750 - (position.x + width);
-                }
-                if (position.y > 150) {
-                    position.y = 150 - height;
-                }
-                position.x += adjustmentX;
-                occupiedPositions.remove(occupiedPos);
-                occupiedPositions.add(position);
-            }
-        }
-    }
-
-    private boolean isDirectlyAbove(float x1, float y1, float x2, float y2, float width, float height) {
-        // More precise check for directly above objects
-        return Math.abs(x1 - x2) <= width && y1 > y2;
+    private boolean isAbove(float x1, float y1, float x2, float y2) {
+        float xTolerance = 100f;
+        return Math.abs(x1 - x2) <= xTolerance && y1 > y2;
     }
 
     private void handleCollision(Bird bird, Obstacle obstacle) {
         if (checkCollision(bird, obstacle)) {
             obstacle.takeDamage(bird.damage);
             bird.isFlying = false;
-
-            if (bird instanceof Bombird) {
-                Bombird bombird = (Bombird) bird;
-                bombird.hasExploded = true;
-                explosionActive = true;
-                explosionTimer = 0f;
-
-                float birdCenterX = (bird.position.x + bird.size.get(0)) / 2;
-                float birdCenterY = (bird.position.y + bird.size.get(1)) / 2;
-                float explosionRadius = 80f;
-
-                for (Pig otherPig : pigs) {
-                    float pigCenterX = (otherPig.position.x + otherPig.size.get(0)) / 2;
-                    float pigCenterY = (otherPig.position.y + otherPig.size.get(1)) / 2;
-
-                    float distance = Vector2.dst(birdCenterX, birdCenterY, pigCenterX, pigCenterY);
-                    if (distance <= explosionRadius) {
-                        otherPig.takeDamage(3);
-                    }
-                    if (otherPig.isDestroyed) {
-                        occupiedPositions.remove(otherPig.position); // Remove old position
-                        //otherPig.position = findUniquePosition(otherPig.position, occupiedPositions, 70f, 70f);
-                        applyGravityDamage(otherPig.position.x, otherPig.position.y);
-                    }
-                }
-
-                for (Obstacle obstacle_ : obstacles) {
-                    float obstacleCenterX = (obstacle_.position.x + obstacle_.width) / 2;
-                    float obstacleCenterY = (obstacle_.position.y + obstacle_.height) / 2;
-
-                    float distance = Vector2.dst(birdCenterX, birdCenterY, obstacleCenterX, obstacleCenterY);
-                    if (distance <= explosionRadius) {
-                        obstacle_.takeDamage(3);
-                    }
-                    if (obstacle_.isDestroyed) {
-                        occupiedPositions.remove(obstacle_.position); // Remove old position
-                        //obstacle.position = findUniquePosition(obstacle.position, occupiedPositions, 70f, 70f);
-                        applyGravityDamage(obstacle_.position.x, obstacle_.position.y);
-                    }
-
-                    if (obstacle instanceof TNT) {
-                        TNT tnt = (TNT) obstacle;
-                        tnt.hasExploded = true;
-                        handleTNTExplosion(tnt);
-                    }
-                }
-            }
 
             if (obstacle instanceof TNT) {
                 TNT tnt = (TNT) obstacle;
@@ -477,6 +371,58 @@ public class Level1 extends Level implements Screen , InputProcessor {
         }
     }
 
+    private Vector2 findUniquePosition(Vector2 currentPos, Set<Vector2> occupiedPositions, Integer objectWidth, Integer objectHeight) {
+        Vector2 newPos = new Vector2(currentPos);
+        int attempts = 0;
+        int maxAttempts = 200; // Increased attempts
+
+        while (attempts < maxAttempts) {
+            // Check if the new position conflicts with any existing positions
+            boolean positionConflicts = occupiedPositions.stream()
+                .anyMatch(existingPos -> isOverlapping(newPos, existingPos, objectWidth, objectHeight));
+
+            if (!positionConflicts) {
+                // If no conflict, add the position and return it
+                occupiedPositions.add(newPos);
+                return newPos;
+            }
+
+            // Try different strategies to find a unique position
+            if (attempts < 50) {
+                // Incrementally move position
+                newPos.x += 20 + (attempts * 5);
+                newPos.y += 20 + (attempts * 5);
+            } else {
+                // More random repositioning in a wider area
+                newPos.x = 600 + (int)(Math.random() * 200);
+                newPos.y = 70 + (int)(Math.random() * 200);
+            }
+
+            // Ensure position stays within reasonable game bounds
+            newPos.x = Math.max(500, Math.min(newPos.x, 800));
+            newPos.y = Math.max(50, Math.min(newPos.y, 250));
+
+            attempts++;
+        }
+
+        // Fallback with guaranteed unique position
+        newPos.set(
+            600 + (int)(Math.random() * 200),
+            70 + (int)(Math.random() * 200)
+        );
+        occupiedPositions.add(newPos);
+        return newPos;
+    }
+
+    // Helper method to check for precise object overlap
+    private boolean isOverlapping(Vector2 newPos, Vector2 existingPos, float width, float height) {
+        return !(newPos.x + width < existingPos.x ||
+            newPos.x > existingPos.x + width ||
+            newPos.y + height < existingPos.y ||
+            newPos.y > existingPos.y + height);
+    }
+
+    // Modified methods
     private void handleCollision(Bird bird, Pig pig) {
         if (checkCollision(bird, pig)) {
             pig.takeDamage(bird.damage);
@@ -631,6 +577,17 @@ public class Level1 extends Level implements Screen , InputProcessor {
 
     private void drawBirds() {
         for (Bird bird : birds) {
+            if (bird.texture==null){
+                if (bird instanceof Bombird){
+                    bird.texture = new Texture("bombird.png");
+                }
+                else if (bird instanceof ClassicBird){
+                    bird.texture = new Texture("classicBird.png");
+                }
+                else{
+                    bird.texture = new Texture("teleBird.png");
+                }
+            }
             batch.draw(bird.texture, bird.position.x, bird.position.y,
                 bird.size.get(0), bird.size.get(1));
         }
@@ -638,12 +595,39 @@ public class Level1 extends Level implements Screen , InputProcessor {
 
     private void drawObstacles() {
         for (Obstacle obstacle : obstacles) {
+            if (obstacle.texture==null){
+                if (obstacle instanceof Stone){
+                    Stone stone = (Stone) obstacle;
+                    obstacle.texture = new Texture (stone.stoneOrientation == Stone.Orientation.HORIZONTAL ? "stone_horizontal.png" :
+                        (stone.stoneOrientation == Stone.Orientation.VERTICAL ? "stone_vertical.png" : "stone_hbox.png"));
+                }
+                else if (obstacle instanceof Wood){
+                    Wood wood = (Wood) obstacle;
+                    obstacle.texture = new Texture(wood.woodOrientation == Wood.Orientation.HORIZONTAL ? "wood_horizontal.png" :
+                        (wood.woodOrientation == Wood.Orientation.VERTICAL ? "wood_vertical.png" :
+                            (wood.woodOrientation == Wood.Orientation.DIAGONAL ? "wood_diagonal.png" : "wood_box.png")));
+                }
+                else{
+                    obstacle.texture = new Texture("tnt.png");
+                }
+            }
             obstacle.render(batch);
         }
     }
 
     private void drawPigs() {
         for (Pig pig : pigs) {
+            if (pig.texture==null){
+                if (pig instanceof ClassicPig){
+                    pig.texture = new Texture("ClassicPig.png");
+                }
+                else if (pig instanceof KingPig){
+                    pig.texture = new Texture("KingPig.png");
+                }
+                else{
+                    pig.texture = new Texture("PrettyPig.png");
+                }
+            }
             batch.draw(pig.texture, pig.position.x, pig.position.y,
                 pig.size.get(0), pig.size.get(1));
         }
@@ -727,9 +711,9 @@ public class Level1 extends Level implements Screen , InputProcessor {
 
     private void handleCollisions() {
         // Create safe copies of collections
-        List<Bird> activeBirds = new ArrayList<>(birds);
-        List<Pig> activePigs = new ArrayList<>(pigs);
-        List<Obstacle> activeObstacles = new ArrayList<>(obstacles);
+//        List<Bird> activeBirds = new ArrayList<>(birds);
+//        List<Pig> activePigs = new ArrayList<>(pigs);
+//        List<Obstacle> activeObstacles = new ArrayList<>(obstacles);
 
         // Tracking lists for removal
         List<Bird> birdsToRemove = new ArrayList<>();
@@ -737,13 +721,13 @@ public class Level1 extends Level implements Screen , InputProcessor {
         List<Obstacle> obstaclesToRemove = new ArrayList<>();
 
         // Process flying birds using an iterator for safe removal
-        for (Bird bird : activeBirds) {
+        for (Bird bird : this.activeBirds) {
             if (bird != null && bird.isFlying) {
                 // Check collisions with pigs
                 for (Pig pig : activePigs) {
                     handleCollision(bird, pig);
                     if (bird instanceof Bombird && ((Bombird) bird).hasExploded) {
-                        //drawExplosion(bird);
+                        drawExplosion(bird);
                         drawBlastEffect(bird.position.x, bird.position.y);
                     }
                     if (pig.isDestroyed) {
@@ -756,7 +740,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
                 for (Obstacle obstacle : activeObstacles) {
                     handleCollision(bird, obstacle);
                     if (obstacle instanceof TNT && ((TNT) obstacle).hasExploded) {
-                        //drawTNTExplosion(obstacle);
+                        drawTNTExplosion(obstacle);
                         drawBlastEffect(bird.position.x, bird.position.y);
                     }
                     if (obstacle.isDestroyed || (obstacle instanceof TNT && ((TNT) obstacle).hasExploded)) {
@@ -777,6 +761,24 @@ public class Level1 extends Level implements Screen , InputProcessor {
         blastPosition.set(x, y);
         isBlastActive = true;
         blastTimer = 0f;
+    }
+
+    private void drawExplosion(Bird bird) {
+        batch.begin();
+        batch.draw(((Bombird) bird).blastTexture, bird.position.x, bird.position.y);
+        batch.end();
+    }
+
+    private void drawTNTExplosion(Obstacle obstacle) {
+        batch.begin();
+        if (obstacle.texture ==null){
+            obstacle.texture = new Texture("tnt.png");
+        }
+        if (((TNT)obstacle).blastTexture == null) {
+            ((TNT) obstacle).blastTexture = new Texture("blast.png");
+        }
+        batch.draw(((TNT) obstacle).blastTexture, obstacle.position.x, obstacle.position.y);
+        batch.end();
     }
 
     private void performCollisionCleanup(List<Bird> birdsToRemove, List<Pig> pigsToRemove, List<Obstacle> obstaclesToRemove) {
@@ -801,7 +803,8 @@ public class Level1 extends Level implements Screen , InputProcessor {
 
     private void checkGameConditions() {
         if (pigs.isEmpty()) {
-            //game.setScreen(new Win(game, player));
+            game.setScreen(new Win(game, player));
+            return;
         }
 
         if (birds.isEmpty()) {
@@ -817,6 +820,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
             // Only transition to lose screen if no birds are in flight
             if (!birdInFlight) {
                 game.setScreen(new Loss(game, 1, player));
+                return;
             }
         }
     }
@@ -939,5 +943,29 @@ public class Level1 extends Level implements Screen , InputProcessor {
         shapeRenderer.end();
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
+    }
+
+    public ArrayList<Bird> getActiveBirds() {
+        return activeBirds;
+    }
+
+    public void setActiveBirds(ArrayList<Bird> activeBirds) {
+        this.activeBirds = activeBirds;
+    }
+
+    public ArrayList<Pig> getActivePigs() {
+        return activePigs;
+    }
+
+    public void setActivePigs(ArrayList<Pig> activePigs) {
+        this.activePigs = activePigs;
+    }
+
+    public ArrayList<Obstacle> getActiveObstacles() {
+        return activeObstacles;
+    }
+
+    public void setActiveObstacles(ArrayList<Obstacle> activeObstacles) {
+        this.activeObstacles = activeObstacles;
     }
 }
