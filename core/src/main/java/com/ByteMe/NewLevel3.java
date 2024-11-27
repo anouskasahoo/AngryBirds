@@ -14,7 +14,7 @@ import java.util.*;
 public class NewLevel3 extends Level implements Screen , InputProcessor {
 
     private final transient Texture slingshot2 = new Texture("slingshot2.png");
-    private final transient Texture backgroundTexture = new Texture("L1.png");
+    private final transient Texture backgroundTexture = new Texture("L3.png");
     private final Player player;
     private final MainLauncher game;
     private Vector2 initialPosition;

@@ -90,15 +90,15 @@ public class LevelsScreen implements Screen {
             }
             if (mouseX >= level4_x && mouseX <= level4_x+level4_w&& mouseY >= level4_y && mouseY <= level4_y+level4_h) {
                 //game.setScreen(new HandScreen(game,4, player));
-                game.setScreen(new NewLevel4(game, player));
+                game.setScreen(new NewLevel4(game, player, false, null));
             }
             if (mouseX >= level5_x && mouseX <= level5_x+level5_w&& mouseY >= level5_y && mouseY <= level5_y+level5_h) {
                 //game.setScreen(new HandScreen(game,5, player));
-                game.setScreen(new NewLevel5(game, player));
+                game.setScreen(new NewLevel5(game, player, false, null));
             }
             if (mouseX >= level6_x && mouseX <= level6_x+level6_w&& mouseY >= level6_y && mouseY <= level6_y+level6_h) {
                 //game.setScreen(new HandScreen(game,6, player));
-                game.setScreen(new NewLevel6(game, player));
+                game.setScreen(new NewLevel6(game, player, false, null));
             }
             if (mouseX >= back_x && mouseX <= back_x+back_width && mouseY >= back_y && mouseY <= back_y+back_height) {
                 game.setScreen(new HomeScreen(game, player));
