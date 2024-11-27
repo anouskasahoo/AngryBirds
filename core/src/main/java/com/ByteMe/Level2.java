@@ -31,6 +31,7 @@ public class Level2 extends Level implements Screen , InputProcessor {
         this.game = game;
         shapeRenderer = new ShapeRenderer();
         this.initialSlingshotPosition = new Vector2(slingshot.position.get(0), slingshot.position.get(1));
+        this.levelNumber = 2;
 
 
         // Initialize birds
@@ -703,7 +704,7 @@ public class Level2 extends Level implements Screen , InputProcessor {
         float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
         if (isClickInBounds(mouseX, mouseY, pauseButton_x, pauseButton_y, pauseButton_w, pauseButton_h)) {
-            game.setScreen(new PauseGame(game, 1, player));
+            game.setScreen(new PauseGame(game, 1, player, this.gameState));
         }
         if (isClickInBounds(mouseX, mouseY, winButton_x, winButton_y, winButton_w, winButton_h)) {
             game.setScreen(new Win(game, player));

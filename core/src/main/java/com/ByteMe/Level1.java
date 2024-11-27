@@ -34,6 +34,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
         this.initialSlingshotPosition = new Vector2(slingshot.position.get(0), slingshot.position.get(1));
         slingshot2 = new Texture("slingshot2.png");
         backgroundTexture = new Texture("Level1_bg.png");
+        this.levelNumber = 1;
 
         if (player.getLoadedGame()==null||player.getLoadedGame().getLevel() instanceof Level1) {
             // Initialize birds
@@ -474,57 +475,6 @@ public class Level1 extends Level implements Screen , InputProcessor {
         for (Obstacle obstacle : obstacles) {
             occupiedPositions.add(new Vector2(obstacle.position));
         }
-    }
-
-    private Vector2 findUniquePosition(Vector2 currentPos, Set<Vector2> occupiedPositions, Integer objectWidth, Integer objectHeight) {
-        Vector2 newPos = new Vector2(currentPos);
-        int attempts = 0;
-        int maxAttempts = 200; // Increased attempts
-
-        while (attempts < maxAttempts) {
-            // Check if the new position conflicts with any existing positions
-            boolean positionConflicts = occupiedPositions.stream()
-                .anyMatch(existingPos -> isOverlapping(newPos, existingPos, objectWidth, objectHeight));
-
-            if (!positionConflicts) {
-                // If no conflict, add the position and return it
-                occupiedPositions.add(newPos);
-                return newPos;
-            }
-
-            // Try different strategies to find a unique position
-            if (attempts < 50) {
-                // Incrementally move position
-                newPos.x += 20 + (attempts * 5);
-                //newPos.y += 20 + (attempts * 5);
-            } else {
-                // More random repositioning in a wider area
-                newPos.x = 600 + (int)(Math.random() * 200);
-                //newPos.y = 70 + (int)(Math.random() * 200);
-            }
-
-            // Ensure position stays within reasonable game bounds
-            newPos.x = Math.max(500, Math.min(newPos.x, 800));
-            newPos.y = Math.max(50, Math.min(newPos.y, 250));
-
-            attempts++;
-        }
-
-        // Fallback with guaranteed unique position
-        newPos.set(
-            600 + (int)(Math.random() * 200),
-            70 + (int)(Math.random() * 200)
-        );
-        occupiedPositions.add(newPos);
-        return newPos;
-    }
-
-    // Helper method to check for precise object overlap
-    private boolean isOverlapping(Vector2 newPos, Vector2 existingPos, float width, float height) {
-        return !(newPos.x + width < existingPos.x ||
-            newPos.x > existingPos.x + width ||
-            newPos.y + height < existingPos.y ||
-            newPos.y > existingPos.y + height);
     }
 
     private void handleCollision(Bird bird, Pig pig) {

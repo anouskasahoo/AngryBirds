@@ -65,6 +65,7 @@ public abstract class Level implements Serializable {
     protected boolean isBlastActive = false;
     protected int score;
     protected GameState gameState;
+    protected int levelNumber;
 
     public Level(MainLauncher game, String t, int p1, int p2, int s1, int s2, Player player) {
         this.game = game;
@@ -647,3 +648,5 @@ public abstract class Level implements Serializable {
 //        Gdx.gl.glDisable(GL20.GL_BLEND);
 //    }
 }
+
+

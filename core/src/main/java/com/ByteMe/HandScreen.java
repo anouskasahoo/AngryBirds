@@ -56,13 +56,13 @@ public class HandScreen implements Screen {
             if (mouseX >= play_x && mouseX <= play_x+play_width && mouseY >= play_y && mouseY <= play_y+play_height) {
                 switch(level) {
                     case 1:
-                        game.setScreen(new Level1(game, player));
+                        game.setScreen(new NewLevel1(game, player));
                         break;
                     case 2:
-                        game.setScreen(new Level2(game, player));
+                        game.setScreen(new NewLevel2(game, player));
                         break;
                     case 3:
-                        game.setScreen(new Level3(game, player));
+                        game.setScreen(new NewLevel6(game, player));
                         break;
                 }
             }
