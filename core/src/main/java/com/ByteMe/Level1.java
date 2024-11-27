@@ -19,7 +19,7 @@ import java.util.*;
 public class Level1 extends Level implements Screen , InputProcessor {
 
     private final transient Texture slingshot2 = new Texture("slingshot2.png");
-    private final transient Texture backgroundTexture = new Texture("Level1_bg.png");
+    private final transient Texture backgroundTexture = new Texture("L1.png");
     private final Player player;
     private final MainLauncher game;
     private Vector2 initialPosition;
@@ -49,11 +49,11 @@ public class Level1 extends Level implements Screen , InputProcessor {
         if (!load) {
             // Initialize birds
             birds = new ArrayList<>();
-            Bombird b1 = new Bombird();
+            ClassicBird b1 = new ClassicBird();
             b1.position.set(90, 160);
             birds.add(b1);
 
-            TeleBird b2 = new TeleBird();
+            ClassicBird b2 = new ClassicBird();
             b2.position.set(50, 70);
             birds.add(b2);
 
@@ -64,32 +64,17 @@ public class Level1 extends Level implements Screen , InputProcessor {
             //Initialize pigs
             pigs = new ArrayList<>();
             ClassicPig cp1 = new ClassicPig();
-            cp1.position.set(677, 70);
+            cp1.position.set(600, 120);
             pigs.add(cp1);
 
             ClassicPig cp2 = new ClassicPig();
-            cp2.position.set(628, 115);
+            cp2.position.set(692, 120);
             pigs.add(cp2);
 
-            KingPig kp1 = new KingPig();
-            kp1.position.set(720, 205);
-            pigs.add(kp1);
-
-            PrettyPig pp1 = new PrettyPig();
-            pp1.position.set(720, 110);
-            pigs.add(pp1);
-
-            obstacles.add(new Wood(new Vector2(585, 110), Wood.Orientation.HORIZONTAL));
-            obstacles.add(new Wood(new Vector2(580, 70), Wood.Orientation.VERTICAL));
-            obstacles.add(new TNT(new Vector2(720, 70)));
-            obstacles.add(new TNT(new Vector2(630, 70)));
-            obstacles.add(new TNT(new Vector2(580, 115)));
-            obstacles.add(new TNT(new Vector2(720, 160)));
-            obstacles.add(new Wood(new Vector2(625, 155), Wood.Orientation.HORIZONTAL));
-            obstacles.add(new Wood(new Vector2(670, 115), Wood.Orientation.VERTICAL));
-            obstacles.add(new Stone(new Vector2(672, 115), Stone.Orientation.HORIZONTAL));
-            obstacles.add(new Stone(new Vector2(720, 115), Stone.Orientation.VERTICAL));
-            obstacles.add(new Stone(new Vector2(760, 115), Stone.Orientation.VERTICAL));
+            obstacles.add(new TNT(new Vector2(600, 70)));
+            obstacles.add(new TNT(new Vector2(690, 70)));
+            obstacles.add(new Wood(new Vector2(645, 110), Wood.Orientation.HORIZONTAL));
+            obstacles.add(new Wood(new Vector2(645, 120), Wood.Orientation.BOX));
             activeBirds.addAll(birds);
             activePigs.addAll(pigs);
             activeObstacles.addAll(obstacles);
@@ -269,47 +254,172 @@ public class Level1 extends Level implements Screen , InputProcessor {
     }
 
     private void applyGravityDamage(float destroyedX, float destroyedY) {
-        for (Pig pig : pigs) {
-            if (isAbove(pig.position.x, pig.position.y, destroyedX, destroyedY)) {
+        // Collect and process pigs first
+        for (Pig pig : new ArrayList<>(pigs)) {
+            if (isDirectlyAbove(pig.position.x, pig.position.y, destroyedX, destroyedY,
+                pig.size.get(0), pig.size.get(1))) {
                 pig.takeDamage(1);
-                pig.position.set(destroyedX, destroyedY);
-                findUniquePosition(pig.position, occupiedPositions,pig.size.get(0), pig.size.get(1));
-                applyGravityEffect(pig.position, 70, occupiedPositions);
+                applyGravityFall(pig, destroyedY, pig.size.get(0), pig.size.get(1), occupiedPositions);
             }
         }
 
-        for (Obstacle obstacle : obstacles) {
-            if (isAbove(obstacle.position.x, obstacle.position.y, destroyedX, destroyedY)) {
+        // Then process obstacles
+        for (Obstacle obstacle : new ArrayList<>(obstacles)) {
+            if (isDirectlyAbove(obstacle.position.x, obstacle.position.y, destroyedX, destroyedY,
+                (int)obstacle.width, (int)obstacle.height)) {
                 obstacle.takeDamage(1);
-                obstacle.position.set(destroyedX, destroyedY);
-                findUniquePosition(obstacle.position, occupiedPositions, (int) obstacle.width, (int) obstacle.height);
-                applyGravityEffect(obstacle.position, 70, occupiedPositions);
+                applyGravityFall(obstacle, destroyedY, (int)obstacle.width, (int)obstacle.height, occupiedPositions);
             }
         }
     }
-    private void applyGravityEffect(Vector2 position, float groundY, Set<Vector2> occupiedPositions) {
-        float step = 10f; // Distance to fall per step
+
+    private void applyGravityFall(Object entity, float groundY, float width, float height, Set<Vector2> occupiedPositions) {
+        Vector2 position = entity instanceof Pig ? ((Pig)entity).position : ((Obstacle)entity).position;
+
+        float step = Math.min(height, 10f);
         Vector2 newPosition = new Vector2(position);
 
-        while (newPosition.y > groundY && !occupiedPositions.contains(new Vector2(newPosition.x, newPosition.y - step))) {
-            newPosition.y -= step; // Simulate falling
+        // Precise fall with no overlap tolerance
+        while (true) {
+            Vector2 testPosition = new Vector2(newPosition.x, newPosition.y - step);
+
+            // Check if falling is impossible
+            if (testPosition.y - height <= groundY) {
+                break;
+            }
+
+            // Boundary checks
+            if (testPosition.x < 0 ||
+                testPosition.x + width > 750 ||
+                testPosition.y < 0 ||
+                testPosition.y + height > 100) {
+                break;
+            }
+
+            // Check for any overlap with ANY existing position
+            boolean canFall = true;
+            for (Vector2 occupiedPos : occupiedPositions) {
+                if (wouldOverlap(testPosition, width, height, occupiedPos, width, height)) {
+                    canFall = false;
+                    break;
+                }
+            }
+
+            // If overlap detected, stop falling
+            if (!canFall) {
+                break;
+            }
+
+            // If no overlap, update position
+            newPosition.set(testPosition);
         }
 
-        occupiedPositions.remove(position); // Remove old position
-        position.set(newPosition); // Update to new position
-        occupiedPositions.add(newPosition); // Mark new position as occupied
+        // Remove old position, update, and add new position
+        occupiedPositions.remove(position);
+        position.set(newPosition);
+        occupiedPositions.add(newPosition);
+
+        // Resolve any remaining overlaps
+        resolveOverlaps(position, width, height, occupiedPositions);
     }
 
+    private boolean wouldOverlap(Vector2 pos1, float width1, float height1,
+                                 Vector2 pos2, float width2, float height2) {
+        return !(pos1.x + width1 <= pos2.x ||   // Too far left
+            pos1.x >= pos2.x + width2 ||   // Too far right
+            pos1.y + height1 <= pos2.y ||  // Too far down
+            pos1.y >= pos2.y + height2);   // Too far up
+    }
 
-    private boolean isAbove(float x1, float y1, float x2, float y2) {
-        float xTolerance = 100f;
-        return Math.abs(x1 - x2) <= xTolerance && y1 > y2;
+    private boolean checkOverlap(Vector2 pos1, float width1, float height1,
+                                 Vector2 pos2, float width2, float height2) {
+        return !(pos1.x + width1 <= pos2.x ||
+            pos1.x >= pos2.x + width2 ||
+            pos1.y + height1 <= pos2.y ||
+            pos1.y >= pos2.y + height2);
+    }
+
+    private void resolveOverlaps(Vector2 position, float width, float height, Set<Vector2> occupiedPositions) {
+        // Additional pass to separate overlapping objects
+        for (Vector2 occupiedPos : new ArrayList<>(occupiedPositions)) {
+            if (checkOverlap(position, width, height, occupiedPos, width, height) &&
+                !position.equals(occupiedPos)) {
+                // Slightly adjust position to resolve overlap
+                float adjustmentX = (position.x < occupiedPos.x) ? -width : width;
+
+                // Boundary-aware adjustment
+                if (position.x + adjustmentX < 0) {
+                    adjustmentX = -position.x;
+                }
+                if (position.x + width + adjustmentX > 750) {
+                    adjustmentX = 750 - (position.x + width);
+                }
+                if (position.y > 150) {
+                    position.y = 150 - height;
+                }
+                position.x += adjustmentX;
+                occupiedPositions.remove(occupiedPos);
+                occupiedPositions.add(position);
+            }
+        }
+    }
+
+    private boolean isDirectlyAbove(float x1, float y1, float x2, float y2, float width, float height) {
+        // More precise check for directly above objects
+        return Math.abs(x1 - x2) <= width && y1 > y2;
     }
 
     private void handleCollision(Bird bird, Obstacle obstacle) {
         if (checkCollision(bird, obstacle)) {
             obstacle.takeDamage(bird.damage);
             bird.isFlying = false;
+
+            if (bird instanceof Bombird) {
+                Bombird bombird = (Bombird) bird;
+                bombird.hasExploded = true;
+                explosionActive = true;
+                explosionTimer = 0f;
+
+                float birdCenterX = (bird.position.x + bird.size.get(0)) / 2;
+                float birdCenterY = (bird.position.y + bird.size.get(1)) / 2;
+                float explosionRadius = 80f;
+
+                for (Pig otherPig : pigs) {
+                    float pigCenterX = (otherPig.position.x + otherPig.size.get(0)) / 2;
+                    float pigCenterY = (otherPig.position.y + otherPig.size.get(1)) / 2;
+
+                    float distance = Vector2.dst(birdCenterX, birdCenterY, pigCenterX, pigCenterY);
+                    if (distance <= explosionRadius) {
+                        otherPig.takeDamage(3);
+                    }
+                    if (otherPig.isDestroyed) {
+                        occupiedPositions.remove(otherPig.position); // Remove old position
+                        //otherPig.position = findUniquePosition(otherPig.position, occupiedPositions, 70f, 70f);
+                        applyGravityDamage(otherPig.position.x, otherPig.position.y);
+                    }
+                }
+
+                for (Obstacle obstacle_ : obstacles) {
+                    float obstacleCenterX = (obstacle_.position.x + obstacle_.width) / 2;
+                    float obstacleCenterY = (obstacle_.position.y + obstacle_.height) / 2;
+
+                    float distance = Vector2.dst(birdCenterX, birdCenterY, obstacleCenterX, obstacleCenterY);
+                    if (distance <= explosionRadius) {
+                        obstacle_.takeDamage(3);
+                    }
+                    if (obstacle_.isDestroyed) {
+                        occupiedPositions.remove(obstacle_.position); // Remove old position
+                        //obstacle.position = findUniquePosition(obstacle.position, occupiedPositions, 70f, 70f);
+                        applyGravityDamage(obstacle_.position.x, obstacle_.position.y);
+                    }
+
+                    if (obstacle instanceof TNT) {
+                        TNT tnt = (TNT) obstacle;
+                        tnt.hasExploded = true;
+                        handleTNTExplosion(tnt);
+                    }
+                }
+            }
 
             if (obstacle instanceof TNT) {
                 TNT tnt = (TNT) obstacle;

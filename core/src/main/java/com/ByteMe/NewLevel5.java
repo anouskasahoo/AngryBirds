@@ -1,3 +1,4 @@
+
 package com.ByteMe;
 
 import com.badlogic.gdx.Gdx;
@@ -12,7 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.util.*;
 
-public class Level3 extends Level implements Screen , InputProcessor {
+public class NewLevel5 extends Level implements Screen , InputProcessor {
 
     private final Texture slingshot2;
     private final Texture backgroundTexture;
@@ -23,57 +24,66 @@ public class Level3 extends Level implements Screen , InputProcessor {
     private Vector2 initialSlingshotPosition;
     private Set<Vector2> occupiedPositions;
 
-    public Level3(MainLauncher game, Player player) {
+    public NewLevel5(MainLauncher game, Player player) {
         super(game, "slingshot1.png", 100, 70, 50, 150, player);
         this.player = player;
         this.game = game;
         shapeRenderer = new ShapeRenderer();
         this.initialSlingshotPosition = new Vector2(slingshot.position.get(0), slingshot.position.get(1));
         slingshot2 = new Texture("slingshot2.png");
-        backgroundTexture = new Texture("level3_bg.png");
-        this.levelNumber = 3;
+        backgroundTexture = new Texture("L5.png");
+        this.levelNumber = 5;
+
+        if (player.getLoadedGame()==null||player.getLoadedGame().getLevel() instanceof Level1) {
+            // Initialize birds
 
 
-        // Initialize birds
-        birds = new ArrayList<>();
-        TeleBird b3 = new TeleBird();
-        b3.position.set(90, 160);
-        birds.add(b3);
+            birds = new ArrayList<>();
+            Bombird b2 = new Bombird();
+            b2.position.set(90, 160);
+            birds.add(b2);
 
-        TeleBird b2 = new TeleBird();
-        b2.position.set(50, 70);
-        birds.add(b2);
+            Bombird b1 = new Bombird();
+            b1.position.set(50, 70);
+            birds.add(b1);
 
-        Bombird b1 = new Bombird();
-        b1.position.set(0, 70);
-        birds.add(b1);
+            TeleBird b3 = new TeleBird();
+            b3.position.set(0, 70);
+            birds.add(b3);
 
-        //Initialize pigs
-        pigs = new ArrayList<>();
-        ClassicPig cp1 = new ClassicPig();
-        cp1.position.set(677, 70);
-        pigs.add(cp1);
+            //Initialize pigs
+            pigs = new ArrayList<>();
+            ClassicPig cp1 = new ClassicPig();
+            cp1.position.set(520, 113);
+            pigs.add(cp1);
 
-        PrettyPig pp2 = new PrettyPig();
-        pp2.position.set(628, 115);
-        pigs.add(pp2);
+            ClassicPig cp2 = new ClassicPig();
+            cp2.position.set(645, 70);
+            pigs.add(cp2);
 
-        KingPig kp1 = new KingPig();
-        kp1.position.set(720, 205);
-        pigs.add(kp1);
+            ClassicPig cp3 = new ClassicPig();
+            cp3.position.set(690, 115);
+            pigs.add(cp3);
 
-        PrettyPig pp1 = new PrettyPig();
-        pp1.position.set(720, 110);
-        pigs.add(pp1);
 
-        obstacles.add(new Wood(new Vector2(585, 110), Wood.Orientation.HORIZONTAL));
-        obstacles.add(new Wood(new Vector2(580, 70), Wood.Orientation.VERTICAL));
-        obstacles.add(new TNT(new Vector2(720, 70)));
-        obstacles.add(new Wood(new Vector2(625, 155), Wood.Orientation.HORIZONTAL));
-        obstacles.add(new Wood(new Vector2(670, 115), Wood.Orientation.VERTICAL));
-        obstacles.add(new Stone(new Vector2(672, 115), Stone.Orientation.HORIZONTAL));
-        obstacles.add(new Stone(new Vector2(720, 115), Stone.Orientation.VERTICAL));
-        obstacles.add(new Stone(new Vector2(760, 115), Stone.Orientation.VERTICAL));
+            PrettyPig pp1 = new PrettyPig();
+            pp1.position.set(560, 110);
+            pigs.add(pp1);
+
+            KingPig kp1 = new KingPig();
+            kp1.position.set(690, 165);
+            pigs.add(kp1);
+
+            obstacles.add(new Stone(new Vector2(510, 70), Stone.Orientation.H_BOX));
+            obstacles.add(new Stone(new Vector2(600, 160), Stone.Orientation.H_BOX));
+            obstacles.add(new TNT(new Vector2(600, 70)));
+            obstacles.add(new Wood(new Vector2(690, 70), Wood.Orientation.BOX));
+            obstacles.add(new TNT(new Vector2(645, 115)));
+            obstacles.add(new Wood(new Vector2(600, 115), Wood.Orientation.BOX));
+            obstacles.add(new Wood(new Vector2(650, 205), Wood.Orientation.BOX));
+            obstacles.add(new Stone(new Vector2(690, 160), Stone.Orientation.HORIZONTAL));
+            obstacles.add(new Stone(new Vector2(730, 120), Stone.Orientation.VERTICAL));
+        }
     }
 
     @Override
@@ -216,6 +226,7 @@ public class Level3 extends Level implements Screen , InputProcessor {
             bird.position.x + bird.size.get(0) > pig.position.x &&
             bird.position.y < pig.position.y + pig.size.get(1) &&
             bird.position.y + bird.size.get(1) > pig.position.y;
+
     }
 
     private boolean checkCollision(Bird bird, Obstacle obstacle) {
@@ -453,57 +464,6 @@ public class Level3 extends Level implements Screen , InputProcessor {
         }
     }
 
-    private Vector2 findUniquePosition(Vector2 currentPos, Set<Vector2> occupiedPositions, Integer objectWidth, Integer objectHeight) {
-        Vector2 newPos = new Vector2(currentPos);
-        int attempts = 0;
-        int maxAttempts = 200; // Increased attempts
-
-        while (attempts < maxAttempts) {
-            // Check if the new position conflicts with any existing positions
-            boolean positionConflicts = occupiedPositions.stream()
-                .anyMatch(existingPos -> isOverlapping(newPos, existingPos, objectWidth, objectHeight));
-
-            if (!positionConflicts) {
-                // If no conflict, add the position and return it
-                occupiedPositions.add(newPos);
-                return newPos;
-            }
-
-            // Try different strategies to find a unique position
-            if (attempts < 50) {
-                // Incrementally move position
-                newPos.x += 20 + (attempts * 5);
-                //newPos.y += 20 + (attempts * 5);
-            } else {
-                // More random repositioning in a wider area
-                newPos.x = 600 + (int)(Math.random() * 200);
-                //newPos.y = 70 + (int)(Math.random() * 200);
-            }
-
-            // Ensure position stays within reasonable game bounds
-            newPos.x = Math.max(500, Math.min(newPos.x, 800));
-            newPos.y = Math.max(50, Math.min(newPos.y, 250));
-
-            attempts++;
-        }
-
-        // Fallback with guaranteed unique position
-        newPos.set(
-            600 + (int)(Math.random() * 200),
-            70 + (int)(Math.random() * 200)
-        );
-        occupiedPositions.add(newPos);
-        return newPos;
-    }
-
-    // Helper method to check for precise object overlap
-    private boolean isOverlapping(Vector2 newPos, Vector2 existingPos, float width, float height) {
-        return !(newPos.x + width < existingPos.x ||
-            newPos.x > existingPos.x + width ||
-            newPos.y + height < existingPos.y ||
-            newPos.y > existingPos.y + height);
-    }
-
     private void handleCollision(Bird bird, Pig pig) {
         if (checkCollision(bird, pig)) {
             pig.takeDamage(bird.damage);
@@ -693,6 +653,9 @@ public class Level3 extends Level implements Screen , InputProcessor {
         float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
         if (isClickInBounds(mouseX, mouseY, pauseButton_x, pauseButton_y, pauseButton_w, pauseButton_h)) {
+            System.out.println("Level 1 trying");
+            this.gameState.setLevel(this);
+            System.out.println("Level 1 success");
             game.setScreen(new PauseGame(game, 1, player, this.gameState));
         }
         if (isClickInBounds(mouseX, mouseY, winButton_x, winButton_y, winButton_w, winButton_h)) {
@@ -801,18 +764,6 @@ public class Level3 extends Level implements Screen , InputProcessor {
         blastPosition.set(x, y);
         isBlastActive = true;
         blastTimer = 0f;
-    }
-
-    private void drawExplosion(Bird bird) {
-        batch.begin();
-        batch.draw(((Bombird) bird).blastTexture, bird.position.x, bird.position.y);
-        batch.end();
-    }
-
-    private void drawTNTExplosion(Obstacle obstacle) {
-        batch.begin();
-        batch.draw(((TNT) obstacle).blastTexture, obstacle.position.x, obstacle.position.y);
-        batch.end();
     }
 
     private void performCollisionCleanup(List<Bird> birdsToRemove, List<Pig> pigsToRemove, List<Obstacle> obstaclesToRemove) {
@@ -966,7 +917,7 @@ public class Level3 extends Level implements Screen , InputProcessor {
 
             // Calculate fade out based on position in trajectory
             float alpha = 1.0f - ((float)i / totalPoints);
-            shapeRenderer.setColor(1, 1, 1, alpha * 0.7f);
+            shapeRenderer.setColor(0, 0, 0, alpha * 0.7f);
 
             // Draw circular dot
             shapeRenderer.circle(point.x, point.y, dotSize * (1.0f - ((float)i / totalPoints)));
@@ -977,173 +928,3 @@ public class Level3 extends Level implements Screen , InputProcessor {
         Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 }
-
-
-//package com.ByteMe;
-//
-//import com.badlogic.gdx.Gdx;
-//import com.badlogic.gdx.Input;
-//import com.badlogic.gdx.Screen;
-//import com.badlogic.gdx.graphics.GL20;
-//import com.badlogic.gdx.graphics.Texture;
-//import com.badlogic.gdx.math.Vector2;
-//
-//import java.util.ArrayList;
-//
-//public class Level3 extends Level implements Screen {
-//
-//    private final Texture slingshot2;
-//    private final Texture backgroundTexture;
-//    private final MainLauncher game;
-//    private final Player player;
-//
-//    public Level3(MainLauncher game, Player player) {
-//        super(game,"slingshot1.png",100,70,50,150);
-//        slingshot2 = new Texture("slingshot2.png");
-//        backgroundTexture = new Texture("level3_bg.png");
-//        this.game = game;
-//        this.player = player;
-//
-//        // Initialize birds
-//        birds = new ArrayList<>();
-//        Bombird b1 = new Bombird();
-//        b1.position.add(0);
-//        b1.position.add(70);
-//        birds.add(b1);
-//
-//        TeleBird b2 = new TeleBird();
-//        b2.position.add(90);
-//        b2.position.add(160);
-//        birds.add(b2);
-//
-//        ClassicBird b3 = new ClassicBird();
-//        b3.position.add(60);
-//        b3.position.add(70);
-//        birds.add(b3);
-//
-//
-//        //Initialize pigs
-//        pigs = new ArrayList<>();
-//        ClassicPig cp1 = new ClassicPig();
-//        cp1.position.add(677);
-//        cp1.position.add(70);
-//        pigs.add(cp1);
-//
-//        ClassicPig cp2 = new ClassicPig();
-//        cp2.position.add(628);
-//        cp2.position.add(115);
-//        pigs.add(cp2);
-//
-//        ClassicPig cp3 = new ClassicPig();
-//        cp3.position.add(628);
-//        cp3.position.add(205);
-//        pigs.add(cp3);
-//
-//        ClassicPig cp4 = new ClassicPig();
-//        cp4.position.add(677);
-//        cp4.position.add(253);
-//        pigs.add(cp4);
-//
-//        KingPig kp1 = new KingPig();
-//        kp1.position.add(720);
-//        kp1.position.add(205);
-//        pigs.add(kp1);
-//
-//        PrettyPig pp1 = new PrettyPig();
-//        pp1.position.add(585);
-//        pp1.position.add(65);
-//        pigs.add(pp1);
-//
-//        obstacles.add(new Wood(new Vector2(532, 70), Wood.Orientation.BOX));
-//        obstacles.add(new Wood(new Vector2(585, 110), Wood.Orientation.HORIZONTAL));
-//        obstacles.add(new Wood(new Vector2(580, 70), Wood.Orientation.VERTICAL));
-//        obstacles.add(new TNT(new Vector2(720, 70)));
-//        obstacles.add(new TNT(new Vector2(630, 70)));
-//        obstacles.add(new TNT(new Vector2(580, 115)));
-//        obstacles.add(new TNT(new Vector2(720, 160)));
-//        obstacles.add(new Wood(new Vector2(625, 155), Wood.Orientation.HORIZONTAL));
-//        obstacles.add(new Wood(new Vector2(670, 115), Wood.Orientation.VERTICAL));
-//        obstacles.add(new Wood(new Vector2(580, 160), Wood.Orientation.BOX));
-//        obstacles.add(new Wood(new Vector2(672, 205), Wood.Orientation.BOX));
-//        obstacles.add(new Stone(new Vector2(628, 160), Stone.Orientation.H_BOX));
-//        obstacles.add(new Stone(new Vector2(672, 115), Stone.Orientation.HORIZONTAL));
-//        obstacles.add(new Stone(new Vector2(720, 115), Stone.Orientation.VERTICAL));
-//        obstacles.add(new Stone(new Vector2(760, 115), Stone.Orientation.VERTICAL));
-//    }
-//
-//    @Override
-//    public void show() {
-//    }
-//
-//    @Override
-//    public void render(float delta) {
-//        Gdx.gl.glClearColor(0.5f, 0.8f, 0.9f, 1);
-//        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-//
-//        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-//            float mouseX = Gdx.input.getX();
-//            float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
-//
-//            if (mouseX >= pauseButton_x && mouseX <= pauseButton_x+pauseButton_w && mouseY >= pauseButton_y && mouseY <= pauseButton_y+pauseButton_h){
-//                game.setScreen(new PauseGame(game,3, player));
-//            }
-//            if (mouseX >= winButton_x && mouseX <= winButton_x+winButton_w && mouseY >= winButton_y && mouseY <= winButton_y+winButton_h){
-//                game.setScreen(new Win(game, player));
-//            }
-//            if (mouseX >= lossButton_x && mouseX <= lossButton_x+lossButton_w && mouseY >= lossButton_y && mouseY <= lossButton_y+lossButton_h){
-//                game.setScreen(new Loss(game,3, player));
-//            }
-//
-//        }
-//
-//        batch.begin();
-//        batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-//        batch.draw(slingshot.texture, slingshot.position.get(0), slingshot.position.get(1), slingshot.size.get(0), slingshot.size.get(1));
-//        for (Bird bird : birds) {
-//            batch.draw(bird.texture, bird.position.get(0), bird.position.get(1), bird.size.get(0), bird.size.get(1));
-//        }
-//
-//        for (Obstacle obstacle : obstacles) {
-//            obstacle.render(batch);
-//        }
-//
-//        for (Pig pig : pigs) {
-//            batch.draw(pig.texture, pig.position.get(0), pig.position.get(1), pig.size.get(0), pig.size.get(1));
-//        }
-//
-//        batch.draw(pauseButton, pauseButton_x, pauseButton_y, pauseButton_w, pauseButton_h);
-//        batch.draw(winButton, winButton_x, winButton_y, winButton_w, winButton_h);
-//        batch.draw(lossButton, lossButton_x, lossButton_y, lossButton_w, lossButton_h);
-//        batch.draw(slingshot2, slingshot.position.get(0) - 5, slingshot.position.get(1), slingshot.size.get(0), slingshot.size.get(1));
-//        batch.end();
-//    }
-//
-//    @Override
-//    public void resize(int width, int height) {
-//    }
-//
-//    @Override
-//    public void pause() {
-//    }
-//
-//    @Override
-//    public void resume() {
-//    }
-//
-//    @Override
-//    public void hide() {
-//    }
-//
-//    @Override
-//    public void dispose() {
-//        super.dispose();
-//        batch.dispose();
-//        slingshot2.dispose();
-//        backgroundTexture.dispose();
-//        for (Bird bird : birds) {
-//            if (bird.texture != null) {
-//                bird.texture.dispose();
-//            }
-//        }
-//    }
-//}
