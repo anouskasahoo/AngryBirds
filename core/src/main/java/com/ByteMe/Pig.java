@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public abstract class Pig implements Serializable {
     private static final long serialVersionUID = 1L;
-    public Texture texture;
+    public transient Texture texture;
     public Vector2 position;
     public ArrayList<Integer> size;
     public int health;

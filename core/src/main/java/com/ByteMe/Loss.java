@@ -10,10 +10,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class Loss implements Screen {
 
     private SpriteBatch batch;
-    private Texture bgtexture;
-    private Texture nextButton;
-    private Texture endButton;
-    private MainLauncher game;
+    private transient Texture bgtexture;
+    private transient Texture nextButton;
+    private transient Texture endButton;
+    private transient MainLauncher game;
     private final Player player;
     private int status;
 
@@ -53,7 +53,7 @@ public class Loss implements Screen {
             if (mouseX >= restart_x && mouseX <= restart_x+restart_width && mouseY >= restart_y && mouseY <= restart_y+restart_height) {
                 switch (status){
                     case 1:
-                        game.setScreen(new Level1(game, player));
+                        game.setScreen(new Level1(game, player,false, null));
                         break;
                     case 2:
                         //game.setScreen(new Level2(game, player));

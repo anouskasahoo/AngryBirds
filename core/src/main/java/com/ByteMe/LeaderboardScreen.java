@@ -7,9 +7,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class LeaderboardScreen implements Screen {
-    private SpriteBatch batch;
-    private Texture bgtexture;
-    private Texture backButton;
+    private transient SpriteBatch batch;
+    private transient Texture bgtexture;
+    private transient Texture backButton;
     private MainLauncher game;
     private final Player player;
 
@@ -74,4 +74,10 @@ public class LeaderboardScreen implements Screen {
     public void dispose() {
 
     }
+
+//    public void loadAfterDeser(){
+//        batch = new SpriteBatch();
+//        bgtexture = new Texture("Leaderboard_bg.png");
+//        backButton = new Texture("backbutton.png");
+//    }
 }

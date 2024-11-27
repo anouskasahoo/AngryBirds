@@ -10,28 +10,31 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.lang.reflect.Field;
 
-public class PauseGame implements Screen {
+public class PauseGame implements Screen, Serializable {
 
-    private SpriteBatch batch;
-    private Texture bgtexture;
-    private Texture resumeButton;
-    private Texture endButton;
-    private Texture saveButton;
+    private transient SpriteBatch batch = new SpriteBatch();
+    private transient Texture bgtexture = new Texture("pause_bg.png");
+    private transient Texture resumeButton = new Texture("resume_button.png");
+    private transient Texture endButton = new Texture("endgame_button.png");
+    private transient Texture saveButton = new Texture("savegame_button.png");
     private MainLauncher game;
     private final Player player;
     private int status;
     private GameState gameState;
 
-    public PauseGame(MainLauncher game, int i, Player player, GameState gameState) {
+    public PauseGame(MainLauncher game, Player player, GameState gameState) {
         this.game=game;
         this.player = player;
-        batch = new SpriteBatch();
-        status = i;
-        bgtexture = new Texture("pause_bg.png");
-        resumeButton = new Texture("resume_button.png");
-        endButton = new Texture("endgame_button.png");
-        saveButton = new Texture("savegame_button.png");
+        //batch = new SpriteBatch();
+        status = gameState.getLevel().levelNumber;
+        //bgtexture = new Texture("pause_bg.png");
+        //resumeButton = new Texture("resume_button.png");
+        //endButton = new Texture("endgame_button.png");
+        //saveButton = new Texture("savegame_button.png");
+        this.gameState = gameState;
     }
 
     @Override
@@ -62,13 +65,12 @@ public class PauseGame implements Screen {
             float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             if (mouseX >= resume_x && mouseX <= resume_x+resume_width && mouseY >= resume_y && mouseY <= resume_y+resume_height) {
-                /*
                 switch (status){
                     case 0:
                         //game.setScreen(new LoadedGame(game, player));
                         break;
                     case 1:
-                        game.setScreen(new Level1(game, player));
+                        game.setScreen(new Level1(game, player,true, gameState));
                         break;
                     case 2:
                         //game.setScreen(new Level2(game, player));
@@ -77,18 +79,18 @@ public class PauseGame implements Screen {
                         //game.setScreen(new Level3(game, player));
                         break;
                 }
-                 */
                 //resume
             }
             if (mouseX >= save_x && mouseX <= save_x+save_width && mouseY >= save_y && mouseY <= save_y+save_height) {
-                game.setScreen(new LevelsScreen(game, player));
-                //end game
-            }
-            if (mouseX >= end_x && mouseX <= end_x+end_width && mouseY >= end_y && mouseY <= end_y+end_height) {
                 System.out.println("Pause trying");
                 saveGame(gameState, player);
                 System.out.println("Pause success");
+                game.setScreen(new HomeScreen(game, player));
                 //save game
+            }
+            if (mouseX >= end_x && mouseX <= end_x+end_width && mouseY >= end_y && mouseY <= end_y+end_height) {
+                game.setScreen(new LevelsScreen(game, player));
+                //end game
             }
 
         }
@@ -130,6 +132,8 @@ public class PauseGame implements Screen {
         try (FileOutputStream fileOut = new FileOutputStream("saved.ser");
             ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
             System.out.println("Save trying");
+            //inspectForTextures(gameState, "gameState");
+
             out.writeObject(gameState);
             System.out.println("Game state saved to saved.ser");
 
@@ -138,7 +142,40 @@ public class PauseGame implements Screen {
             System.out.println("Player's loaded game updated.");
         } catch (IOException e) {
             System.err.println("Error saving game: " + e.getMessage());
+            e.printStackTrace();
         }
     }
+/*
+    public static void inspectForTextures(Object obj, String path) {
+        if (obj == null) return;
+
+        Class<?> clazz = obj.getClass();
+        if (clazz == Texture.class) {
+            System.out.println("Found Texture at: " + path);
+            return;
+        }
+
+        if (clazz.isArray()) {
+            Object[] array = (Object[]) obj;
+            for (int i = 0; i < array.length; i++) {
+                inspectForTextures(array[i], path + "[" + i + "]");
+            }
+        } else if (obj instanceof Iterable) {
+            int index = 0;
+            for (Object item : (Iterable<?>) obj) {
+                inspectForTextures(item, path + "[" + index + "]");
+                index++;
+            }
+        } else {
+            for (Field field : clazz.getDeclaredFields()) {
+                field.setAccessible(true);
+                try {
+                    inspectForTextures(field.get(obj), path + "." + field.getName());
+                } catch (IllegalAccessException ignored) {}
+            }
+        }
+    }
+
+ */
 
 }

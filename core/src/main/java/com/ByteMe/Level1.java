@@ -32,7 +32,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
 //    private transient ArrayList<Obstacle> activeObstacles;
 
 
-    public Level1(MainLauncher game, Player player, boolean load) {
+    public Level1(MainLauncher game, Player player, boolean load, GameState gameState) {
         super(game, "slingshot1.png", 100, 70, 50, 150, player);
         this.levelNumber = 1;
         //slingshot2 = new Texture("slingshot2.png");
@@ -79,9 +79,9 @@ public class Level1 extends Level implements Screen , InputProcessor {
             activePigs.addAll(pigs);
             activeObstacles.addAll(obstacles);
         }
-        else{
+        else if (gameState == null){
             birds.addAll(player.getLoadedGame().getLevel().activeBirds);
-            obstacles.addAll(player.getLoadedGame().getLevel().obstacles);
+            obstacles.addAll(player.getLoadedGame().getLevel().activeObstacles);
             pigs.addAll(player.getLoadedGame().getLevel().activePigs);
 
 //            try (FileInputStream fileIn = new FileInputStream("saved.ser");
@@ -101,6 +101,14 @@ public class Level1 extends Level implements Screen , InputProcessor {
             activePigs.addAll(pigs);
             activeObstacles.addAll(obstacles);
 //
+        }
+        else{
+            birds.addAll(gameState.getLevel().activeBirds);
+            obstacles.addAll(gameState.getLevel().activeObstacles);
+            pigs.addAll(gameState.getLevel().activePigs);
+            activeBirds.addAll(birds);
+            activePigs.addAll(pigs);
+            activeObstacles.addAll(obstacles);
         }
     }
 
@@ -763,7 +771,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
             System.out.println("Level 1 trying");
             this.gameState.setLevel(this);
             System.out.println("Level 1 success");
-            game.setScreen(new PauseGame(game, 1, player, this.gameState));
+            game.setScreen(new PauseGame(game, player, this.gameState));
         }
         if (isClickInBounds(mouseX, mouseY, winButton_x, winButton_y, winButton_w, winButton_h)) {
             game.setScreen(new Win(game, player));
@@ -1044,7 +1052,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
 
             // Calculate fade out based on position in trajectory
             float alpha = 1.0f - ((float)i / totalPoints);
-            shapeRenderer.setColor(1, 1, 1, alpha * 0.7f);
+            shapeRenderer.setColor(0, 0, 0, alpha * 0.7f);
 
             // Draw circular dot
             shapeRenderer.circle(point.x, point.y, dotSize * (1.0f - ((float)i / totalPoints)));

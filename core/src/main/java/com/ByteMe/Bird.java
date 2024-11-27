@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public abstract class Bird implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    public Texture texture;
+    public transient Texture texture;
     public ArrayList<Integer> size;
     public Vector2 position;
     Vector2 velocity;
@@ -36,6 +36,10 @@ public abstract class Bird implements Serializable {
     public void launch() {
         isFlying = true;
         velocity.set(launchVelocityX, launchVelocityY);
+    }
+
+    public void loadAfterDeser(String t){
+        texture = new Texture(t);
     }
 
 }

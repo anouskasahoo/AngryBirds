@@ -7,14 +7,14 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class HomeScreen implements Screen {
-    private final SpriteBatch batch;
-    private final Texture backgroundTexture;
+    private transient SpriteBatch batch;
+    private transient Texture backgroundTexture;
     private MainLauncher game;
     private final Player player;
-    private final Texture exitButton;
-    private final Texture loadButton;
-    private final Texture boardButton;
-    private final Texture playButton;
+    private transient Texture exitButton;
+    private transient Texture loadButton;
+    private transient Texture boardButton;
+    private transient Texture playButton;
 
     public HomeScreen(MainLauncher game, Player player) {
         this.game = game;
@@ -62,7 +62,7 @@ public class HomeScreen implements Screen {
                 Gdx.app.exit();
             }
             if (mouseX >= load_x && mouseX <= load_x+load_width && mouseY >= load_y && mouseY <= load_y+load_height) {
-                //game.setScreen(new LoadedGame(game, player));
+                game.setScreen(new LoadedGame(game, player));
             }
             if (mouseX >= board_x && mouseX <= board_x+board_width && mouseY >= board_y && mouseY <= board_y+board_height) {
                 game.setScreen(new LeaderboardScreen(game, player));
@@ -105,6 +105,15 @@ public class HomeScreen implements Screen {
     public void dispose() {
         batch.dispose();
         backgroundTexture.dispose();
+    }
+
+    public void loadAfterDeser(){
+        batch = new SpriteBatch();
+        backgroundTexture = new Texture("Home_bg.png");
+        exitButton = new Texture("home_exitbutton.png");
+        loadButton = new Texture("home_loadbutton.png");
+        boardButton = new Texture("leaderboard.png");
+        playButton = new Texture("home_playbutton.png");
     }
 }
 

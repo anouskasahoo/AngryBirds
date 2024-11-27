@@ -5,11 +5,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainLauncher extends Game {
+public class MainLauncher extends Game implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     static Map<Integer, String> levelsBg = new HashMap<>();
     static ArrayList<Level> levels;
     static ArrayList<Player> players;

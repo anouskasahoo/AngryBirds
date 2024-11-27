@@ -641,7 +641,7 @@ public class NewLevel2 extends Level implements Screen , InputProcessor {
             System.out.println("Level 1 trying");
             this.gameState.setLevel(this);
             System.out.println("Level 1 success");
-            game.setScreen(new PauseGame(game, 1, player, this.gameState));
+            game.setScreen(new PauseGame(game, player, this.gameState));
         }
         if (isClickInBounds(mouseX, mouseY, winButton_x, winButton_y, winButton_w, winButton_h)) {
             game.setScreen(new Win(game, player));

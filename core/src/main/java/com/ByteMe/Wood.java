@@ -20,5 +20,6 @@ public class Wood extends Obstacle {
             orientation == Orientation.HORIZONTAL ? 10 : 50,
             2 // 2 health
         );
+        this.woodOrientation = orientation;
     }
 }

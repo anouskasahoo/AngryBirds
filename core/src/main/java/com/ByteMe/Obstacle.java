@@ -9,11 +9,13 @@ import java.io.Serializable;
 public abstract class Obstacle implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    protected Texture texture;
+    protected transient Texture texture;
     protected Vector2 position;
     protected float width, height;
     public int health;
     public boolean isDestroyed = false;
+    protected Wood.Orientation woodOrientation;
+    protected Stone.Orientation stoneOrientation;
 
     public Obstacle(String texturePath, Vector2 position, float width, float height, int health) {
         this.texture = new Texture(texturePath);

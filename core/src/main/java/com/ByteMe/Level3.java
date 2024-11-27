@@ -693,7 +693,7 @@ public class Level3 extends Level implements Screen , InputProcessor {
         float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
         if (isClickInBounds(mouseX, mouseY, pauseButton_x, pauseButton_y, pauseButton_w, pauseButton_h)) {
-            game.setScreen(new PauseGame(game, 1, player, this.gameState));
+            game.setScreen(new PauseGame(game, player, this.gameState));
         }
         if (isClickInBounds(mouseX, mouseY, winButton_x, winButton_y, winButton_w, winButton_h)) {
             game.setScreen(new Win(game, player));

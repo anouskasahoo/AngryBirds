@@ -1,13 +1,13 @@
 package com.ByteMe;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.Map;
 
 public class Player implements Serializable {
     private static final long serialVersionUID = 1L;
 
     String name;
-    private transient GameState loadedGame;
+    private transient GameState loadedGame = null;
 
     public String getName() {
         return name;
@@ -15,7 +15,21 @@ public class Player implements Serializable {
 
     public Player(String name) {
         this.name = name;
-        this.loadedGame = null;
+        //this.loadedGame = null;
+
+        File savedFile = new File("saved.ser");
+        if (savedFile.exists() && savedFile.length() > 0) {
+            try (FileInputStream fileIn = new FileInputStream("saved.ser");
+                 ObjectInputStream in = new ObjectInputStream(fileIn)) {
+                GameState gameState = (GameState) in.readObject();
+                this.setLoadedGame(gameState);
+                System.out.println("Game state loaded from saved.ser");
+                System.out.println(gameState.getLevel().levelNumber);
+
+            } catch (IOException | ClassNotFoundException e) {
+                System.err.println("Error loading game: " + e.getMessage());
+            }
+        }
     }
     public Player(){
 
