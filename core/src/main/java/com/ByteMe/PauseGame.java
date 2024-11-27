@@ -13,6 +13,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
+import static com.ByteMe.MainLauncher.players;
+
 public class PauseGame implements Screen, Serializable {
 
     private transient SpriteBatch batch = new SpriteBatch();
@@ -73,10 +75,10 @@ public class PauseGame implements Screen, Serializable {
                         game.setScreen(new Level1(game, player,true, gameState));
                         break;
                     case 2:
-                        //game.setScreen(new Level2(game, player));
+                        //game.setScreen(new Level2(game, player, true, gameState));
                         break;
                     case 3:
-                        //game.setScreen(new Level3(game, player));
+                        //game.setScreen(new Level3(game, player, true, gameState));
                         break;
                 }
                 //resume
@@ -129,21 +131,25 @@ public class PauseGame implements Screen, Serializable {
     }
 
     public static void saveGame(GameState gameState, Player player) {
-        try (FileOutputStream fileOut = new FileOutputStream("saved.ser");
-            ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-            System.out.println("Save trying");
-            //inspectForTextures(gameState, "gameState");
+        player.setLoadedGame(gameState);
+        System.out.println("Player's loaded game updated.");
 
-            out.writeObject(gameState);
-            System.out.println("Game state saved to saved.ser");
-
-            // Update player's loaded game
-            player.setLoadedGame(gameState);
-            System.out.println("Player's loaded game updated.");
-        } catch (IOException e) {
-            System.err.println("Error saving game: " + e.getMessage());
-            e.printStackTrace();
-        }
+//        try (FileOutputStream fileOut = new FileOutputStream("saved.ser");
+//            ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+//            System.out.println("Save trying");
+//            //inspectForTextures(gameState, "gameState");
+//
+//            out.writeObject(players);
+//            for (Player p:players){
+//                System.out.println(p.name);
+//            }
+//            System.out.println("Game state saved to saved.ser");
+//
+//            System.out.println("Player's loaded game updated.");
+//        } catch (IOException e) {
+//            System.err.println("Error saving game: " + e.getMessage());
+//            e.printStackTrace();
+//        }
     }
 /*
     public static void inspectForTextures(Object obj, String path) {

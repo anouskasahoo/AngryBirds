@@ -10,13 +10,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.util.Objects;
+
+import static com.ByteMe.MainLauncher.players;
+
 public class LoginScreen implements Screen {
     private final MainLauncher game;
     private final SpriteBatch batch;
     private Texture backgroundTexture;
     private Texture exitButton;
     private Texture playButton;
-    Player player;
+    Player player = null;
     private Stage stage;
     private TextField playerNameField;
     private Skin skin;
@@ -30,7 +34,7 @@ public class LoginScreen implements Screen {
         backgroundTexture = new Texture("login.png");
         exitButton = new Texture("ExitButton.png");
         playButton = new Texture("PlayButton.png");
-        this.player = new Player();
+//        this.player = new Player();
 
         stage = new Stage(new ScreenViewport());
         skin = new Skin(Gdx.files.internal("uiskin.json"));
@@ -72,7 +76,22 @@ public class LoginScreen implements Screen {
                 if (enteredName.isEmpty()) {
                     popupTimer = 80;
                 } else {
-                    player.setName(enteredName);
+//                    player.setName(enteredName);
+                    for (Player p:players){
+                        if (Objects.equals(p.getName(), enteredName)){
+                            player = p;
+                            break;
+                        }
+                    }
+                    if (player == null){
+                        player = new Player(enteredName);
+                        players.add(player);
+                    }
+
+                    for (Player p:players){
+                        System.out.println(p.name);
+                    }
+
                     game.setScreen(new HomeScreen(game, player));
                 }
             }
