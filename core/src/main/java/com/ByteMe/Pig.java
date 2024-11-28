@@ -2,9 +2,12 @@ package com.ByteMe;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class Pig implements Serializable {
     private static final long serialVersionUID = 1L;

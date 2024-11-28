@@ -37,9 +37,4 @@ public abstract class Bird implements Serializable {
         isFlying = true;
         velocity.set(launchVelocityX, launchVelocityY);
     }
-
-    public void loadAfterDeser(String t){
-        texture = new Texture(t);
-    }
-
 }

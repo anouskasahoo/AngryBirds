@@ -872,7 +872,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
         obstacles.removeAll(obstaclesToRemove);
     }
 
-    private void resetNextBird() {
+    void resetNextBird() {
         Bird nextBird = birds.get(0);
         nextBird.position.set(90, 160);
         nextBird.isFlying = false;

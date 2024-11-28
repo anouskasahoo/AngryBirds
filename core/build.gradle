@@ -1,6 +1,11 @@
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 eclipse.project.name = appName + '-core'
 
+repositories {
+  mavenCentral()  // Ensure Maven Central is included
+  jcenter()       // Fallback repository
+}
+
 dependencies {
   api "com.badlogicgames.ashley:ashley:$ashleyVersion"
   api "com.badlogicgames.box2dlights:box2dlights:$box2dlightsVersion"
@@ -12,7 +17,18 @@ dependencies {
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
   api "com.kotcrab.vis:vis-ui:$visUiVersion"
 
-  if(enableGraalNative == 'true') {
+  // JUnit and Mockito dependencies
+  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+  testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+  testImplementation 'org.mockito:mockito-core:4.8.1'  // Use a stable version of Mockito core
+  testImplementation 'org.mockito:mockito-junit-jupiter:4.8.1'  // Use a stable version of Mockito JUnit integration
+
+  if (enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
+}
+
+test {
+  useJUnitPlatform()  // Make sure Gradle uses JUnit 5 to run the tests
 }
