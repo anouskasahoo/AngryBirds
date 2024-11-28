@@ -56,10 +56,19 @@ public class Loss implements Screen {
                         game.setScreen(new Level1(game, player,false, null));
                         break;
                     case 2:
-                        //game.setScreen(new Level2(game, player));
+                        game.setScreen(new NewLevel2(game, player, false, null));
                         break;
                     case 3:
-                        //game.setScreen(new Level3(game, player));
+                        game.setScreen(new NewLevel3(game, player, false, null));
+                        break;
+                    case 4:
+                        game.setScreen(new NewLevel4(game, player, false, null));
+                        break;
+                    case 5:
+                        game.setScreen(new NewLevel5(game, player, false, null));
+                        break;
+                    case 6:
+                        game.setScreen(new NewLevel6(game, player, false, null));
                         break;
                 }
             }

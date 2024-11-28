@@ -806,7 +806,7 @@ public class NewLevel6 extends Level implements Screen , InputProcessor {
             game.setScreen(new Win(game, player));
         }
         if (isClickInBounds(mouseX, mouseY, lossButton_x, lossButton_y, lossButton_w, lossButton_h)) {
-            game.setScreen(new Loss(game, 1, player));
+            game.setScreen(new Loss(game, 6, player));
         }
     }
 

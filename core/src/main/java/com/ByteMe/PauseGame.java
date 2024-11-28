@@ -63,17 +63,23 @@ public class PauseGame implements Screen, Serializable {
 
             if (mouseX >= resume_x && mouseX <= resume_x+resume_width && mouseY >= resume_y && mouseY <= resume_y+resume_height) {
                 switch (status){
-                    case 0:
-                        //game.setScreen(new LoadedGame(game, player));
-                        break;
                     case 1:
                         game.setScreen(new Level1(game, player,true, gameState));
                         break;
                     case 2:
-                        //game.setScreen(new Level2(game, player, true, gameState));
+                        game.setScreen(new NewLevel2(game, player, true, gameState));
                         break;
                     case 3:
-                        //game.setScreen(new Level3(game, player, true, gameState));
+                        game.setScreen(new NewLevel3(game, player, true, gameState));
+                        break;
+                    case 4:
+                        game.setScreen(new NewLevel4(game, player, true, gameState));
+                        break;
+                    case 5:
+                        game.setScreen(new NewLevel5(game, player, true, gameState));
+                        break;
+                    case 6:
+                        game.setScreen(new NewLevel6(game, player, true, gameState));
                         break;
                 }
                 //resume
