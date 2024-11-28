@@ -13,11 +13,11 @@ public class LeaderboardScreen implements Screen {
     private MainLauncher game;
     private final Player player;
 
-    public LeaderboardScreen(MainLauncher game, Player player) {
+    public LeaderboardScreen(MainLauncher game, Player player, String t) {
         this.game=game;
         this.player = player;
         batch = new SpriteBatch();
-        bgtexture = new Texture("Leaderboard_bg.png");
+        bgtexture = new Texture(t);
         backButton = new Texture("backbutton.png");
     }
 

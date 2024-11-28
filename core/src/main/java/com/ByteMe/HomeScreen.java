@@ -21,15 +21,17 @@ public class HomeScreen implements Screen {
     private transient Texture loadButton;
     private transient Texture boardButton;
     private transient Texture playButton;
+    private transient Texture tutButton;
 
     public HomeScreen(MainLauncher game, Player player) {
         this.game = game;
         this.player = player;
         batch = new SpriteBatch();
-        backgroundTexture = new Texture("Home_bg.png");
+        backgroundTexture = new Texture("homebg.png");
         exitButton = new Texture("home_exitbutton.png");
         loadButton = new Texture("home_loadbutton.png");
         boardButton = new Texture("leaderboard.png");
+        tutButton = new Texture("tut_button.png");
         playButton = new Texture("home_playbutton.png");
     }
 
@@ -55,6 +57,10 @@ public class HomeScreen implements Screen {
         int board_y = 300;
         int board_width = 150;
         int board_height = 100;
+        int tut_x = 25;
+        int tut_y = 300;
+        int tut_width = 180;
+        int tut_height = 120;
         int play_x = 250;
         int play_y = 75;
         int play_width = 330;
@@ -71,8 +77,11 @@ public class HomeScreen implements Screen {
             if (mouseX >= load_x && mouseX <= load_x+load_width && mouseY >= load_y && mouseY <= load_y+load_height) {
                 game.setScreen(new LoadedGame(game, player));
             }
+            if (mouseX >= tut_x && mouseX <= tut_x + tut_width && mouseY >= tut_y && mouseY <= tut_y + tut_height) {
+                game.setScreen(new LeaderboardScreen(game, player, "tutorial.png"));
+            }
             if (mouseX >= board_x && mouseX <= board_x+board_width && mouseY >= board_y && mouseY <= board_y+board_height) {
-                game.setScreen(new LeaderboardScreen(game, player));
+                game.setScreen(new LeaderboardScreen(game, player, "Leaderboard_bg.png"));
             }
             if (mouseX >= play_x && mouseX <= play_x+play_width && mouseY >= play_y && mouseY <= play_y+play_height) {
                 game.setScreen(new LevelsScreen (game, player));
@@ -84,6 +93,7 @@ public class HomeScreen implements Screen {
         batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.draw(exitButton, exit_x, exit_y, exit_width, exit_height);
         batch.draw(loadButton, load_x, load_y, load_width, load_height);
+        batch.draw(tutButton, tut_x, tut_y, tut_width, tut_height);
         batch.draw(boardButton, board_x, board_y, board_width, board_height);
         batch.draw(playButton, play_x, play_y, play_width, play_height);
         batch.end();
