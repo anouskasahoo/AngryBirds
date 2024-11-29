@@ -74,7 +74,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
             activePigs.addAll(pigs);
             activeObstacles.addAll(obstacles);
         }
-        else if (gameState == null){ //LOAD GAME
+        else if (gameState == null){
             birds.addAll(player.getLoadedGame().getLevel().activeBirds);
             obstacles.addAll(player.getLoadedGame().getLevel().activeObstacles);
             pigs.addAll(player.getLoadedGame().getLevel().activePigs);
@@ -83,7 +83,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
             activeObstacles.addAll(obstacles);
             performCollisionCleanup(player.getLoadedGame().getLevel().birdsToRemove, player.getLoadedGame().getLevel().pigsToRemove, player.getLoadedGame().getLevel().obstaclesToRemove);
         }
-        else{ //RESUME GAME
+        else{
             birds.addAll(gameState.getLevel().activeBirds);
             obstacles.addAll(gameState.getLevel().activeObstacles);
             pigs.addAll(gameState.getLevel().activePigs);
@@ -126,23 +126,23 @@ public class Level1 extends Level implements Screen , InputProcessor {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) throws IndexOutOfBoundsException{
         screenY = Gdx.graphics.getHeight() - screenY;
-       try{
-           Bird firstBird = birds.get(0);
-           float birdX = firstBird.position.x;
-           float birdY = firstBird.position.y;
-           float birdWidth = firstBird.size.get(0);
-           float birdHeight = firstBird.size.get(1);
+        try{
+            Bird firstBird = birds.get(0);
+            float birdX = firstBird.position.x;
+            float birdY = firstBird.position.y;
+            float birdWidth = firstBird.size.get(0);
+            float birdHeight = firstBird.size.get(1);
 
-           if (screenX >= birdX && screenX <= birdX + birdWidth && screenY >= birdY && screenY <= birdY + birdHeight) {
-               isDragging = true;
-               return true;
-           }
-           return false;
-       }
-       catch (IndexOutOfBoundsException e){
-           checkGameConditions();
-       }
-       return false;
+            if (screenX >= birdX && screenX <= birdX + birdWidth && screenY >= birdY && screenY <= birdY + birdHeight) {
+                isDragging = true;
+                return true;
+            }
+            return false;
+        }
+        catch (IndexOutOfBoundsException e){
+            checkGameConditions();
+        }
+        return false;
     }
 
     @Override
@@ -758,12 +758,12 @@ public class Level1 extends Level implements Screen , InputProcessor {
             System.out.println("Level 1 success");
             game.setScreen(new PauseGame(game, player, this.gameState));
         }
-//        if (isClickInBounds(mouseX, mouseY, winButton_x, winButton_y, winButton_w, winButton_h)) {
-//            game.setScreen(new Win(game, player));
-//        }
-//        if (isClickInBounds(mouseX, mouseY, lossButton_x, lossButton_y, lossButton_w, lossButton_h)) {
-//            game.setScreen(new Loss(game, 1, player));
-//        }
+        if (isClickInBounds(mouseX, mouseY, winButton_x, winButton_y, winButton_w, winButton_h)) {
+            game.setScreen(new Win(game, player));
+        }
+        if (isClickInBounds(mouseX, mouseY, lossButton_x, lossButton_y, lossButton_w, lossButton_h)) {
+            game.setScreen(new Loss(game, 1, player));
+        }
     }
 
     private boolean isClickInBounds(float x, float y, float buttonX, float buttonY, float width, float height) {
@@ -819,9 +819,6 @@ public class Level1 extends Level implements Screen , InputProcessor {
 //        List<Obstacle> activeObstacles = new ArrayList<>(obstacles);
 
         // Tracking lists for removal
-//        List<Bird> birdsToRemove = new ArrayList<>();
-//        List<Pig> pigsToRemove = new ArrayList<>();
-//        List<Obstacle> obstaclesToRemove = new ArrayList<>();
 
         // Process flying birds using an iterator for safe removal
         for (Bird bird : this.activeBirds) {

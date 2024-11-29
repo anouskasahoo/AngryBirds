@@ -13,7 +13,7 @@ public class LoadedGame extends Level implements Screen {
     private transient Texture playButton = new Texture("play_yellow.png");
     private transient Texture exitButton = new Texture("exit_yellow.png");
 
-    private GameState gameState = null;
+    private GameState gameState;
 
     public LoadedGame(MainLauncher game, Player player, boolean load) {
         super(game, "slingshot1.png", 100, 70, 50, 150, player);
@@ -65,7 +65,7 @@ public class LoadedGame extends Level implements Screen {
                 if (gameState == null) {
                     game.setScreen(new LevelsScreen(game, player));
                 }
-                if (gameState!=null){
+                else{
                     game.setScreen(new Level1(game, player, true, null)); //ISSUE1: SWITCH CASE FOR ALL LEVELS
                 }
             }
