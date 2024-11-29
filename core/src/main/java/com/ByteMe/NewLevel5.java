@@ -774,12 +774,12 @@ public class NewLevel5 extends Level implements Screen , InputProcessor {
             System.out.println("Level 1 success");
             game.setScreen(new PauseGame(game, player, this.gameState));
         }
-        if (isClickInBounds(mouseX, mouseY, winButton_x, winButton_y, winButton_w, winButton_h)) {
-            game.setScreen(new Win(game, player));
-        }
-        if (isClickInBounds(mouseX, mouseY, lossButton_x, lossButton_y, lossButton_w, lossButton_h)) {
-            game.setScreen(new Loss(game, 5, player));
-        }
+//        if (isClickInBounds(mouseX, mouseY, winButton_x, winButton_y, winButton_w, winButton_h)) {
+//            game.setScreen(new Win(game, player));
+//        }
+//        if (isClickInBounds(mouseX, mouseY, lossButton_x, lossButton_y, lossButton_w, lossButton_h)) {
+//            game.setScreen(new Loss(game, 5, player));
+//        }
     }
 
     private boolean isClickInBounds(float x, float y, float buttonX, float buttonY, float width, float height) {
@@ -918,7 +918,7 @@ public class NewLevel5 extends Level implements Screen , InputProcessor {
 
             // Only transition to lose screen if no birds are in flight
             if (!birdInFlight) {
-                game.setScreen(new Loss(game, 1, player));
+                game.setScreen(new Loss(game, 5, player));
                 return;
             }
         }

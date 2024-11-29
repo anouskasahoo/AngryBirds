@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class Win implements Screen {
 
     private SpriteBatch batch;
-    private Texture bgtexture = new Texture("win_bg.png");
+    private Texture bgtexture;
     private Texture nextButton;
     private Texture endButton;
     private MainLauncher game;

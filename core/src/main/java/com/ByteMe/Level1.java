@@ -758,12 +758,12 @@ public class Level1 extends Level implements Screen , InputProcessor {
             System.out.println("Level 1 success");
             game.setScreen(new PauseGame(game, player, this.gameState));
         }
-        if (isClickInBounds(mouseX, mouseY, winButton_x, winButton_y, winButton_w, winButton_h)) {
-            game.setScreen(new Win(game, player));
-        }
-        if (isClickInBounds(mouseX, mouseY, lossButton_x, lossButton_y, lossButton_w, lossButton_h)) {
-            game.setScreen(new Loss(game, 1, player));
-        }
+//        if (isClickInBounds(mouseX, mouseY, winButton_x, winButton_y, winButton_w, winButton_h)) {
+//            game.setScreen(new Win(game, player));
+//        }
+//        if (isClickInBounds(mouseX, mouseY, lossButton_x, lossButton_y, lossButton_w, lossButton_h)) {
+//            game.setScreen(new Loss(game, 1, player));
+//        }
     }
 
     private boolean isClickInBounds(float x, float y, float buttonX, float buttonY, float width, float height) {

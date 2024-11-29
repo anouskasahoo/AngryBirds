@@ -35,12 +35,10 @@ public class MainLauncher extends Game implements Serializable {
     @Override
     public void create() {
         loadPlayers();
-        //backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("bg_music.mp3"));
-        //backgroundMusic.setLooping(true);
-        //backgroundMusic.play();
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("bg_music.mp3"));
+        backgroundMusic.setLooping(true);
+        backgroundMusic.play();
         setScreen(new LoadingScreen(this));
-//        Player player = new Player();
-//        setScreen(new Win(this, player));
     }
 
     @Override
