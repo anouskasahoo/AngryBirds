@@ -22,9 +22,9 @@ public class Level1 extends Level implements Screen , InputProcessor {
     private Vector2 initialSlingshotPosition;
     private Set<Vector2> occupiedPositions;
     private boolean load;
-//    private transient ArrayList<Bird> activeBirds;
-//    private transient ArrayList<Pig> activePigs;
-//    private transient ArrayList<Obstacle> activeObstacles;
+    private ArrayList<Bird> birdsToRemove;
+    private ArrayList<Pig> pigsToRemove;
+    private ArrayList<Obstacle> obstaclesToRemove;
 
 
     public Level1(MainLauncher game, Player player, boolean load, GameState gameState) {
@@ -37,9 +37,9 @@ public class Level1 extends Level implements Screen , InputProcessor {
         //shapeRenderer = new ShapeRenderer();
         this.initialSlingshotPosition = new Vector2(slingshot.position.get(0), slingshot.position.get(1));
         this.load = load;
-//        List<Bird> activeBirds = new ArrayList<>(birds);
-//        List<Pig> activePigs = new ArrayList<>(pigs);
-//        List<Obstacle> activeObstacles = new ArrayList<>(obstacles);
+        List<Bird> birdsToRemove = new ArrayList<>(birds);
+        List<Pig> pigsToRemove = new ArrayList<>(pigs);
+        List<Obstacle> activeObstacles = new ArrayList<>(obstacles);
 
         if (!load) {
             // Initialize birds
@@ -81,7 +81,7 @@ public class Level1 extends Level implements Screen , InputProcessor {
             activeBirds.addAll(birds);
             activePigs.addAll(pigs);
             activeObstacles.addAll(obstacles);
-//
+            performCollisionCleanup(birdsToRemove, pigsToRemove, obstaclesToRemove);
         }
         else{
             birds.addAll(gameState.getLevel().activeBirds);
