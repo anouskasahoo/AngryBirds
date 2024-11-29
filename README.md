@@ -21,7 +21,8 @@ The game is developed using Java with a strong emphasis on **Object-Oriented Pro
 
 The gameplay features **slingshot-based projectile motion**, where players use Angry Birds with unique abilities to defeat villains (pigs). The six hardcoded levels, each representing an Infinity Stone, guide players toward the ultimate goal of collecting all stones to win.
 
-**Serialization** is implemented to save player progress, ensuring continuity across sessions. Additionally, **immersive audio-visual effects** enhance the Marvel-inspired theme, while sprite animations bring the characters and gameplay elements to life.
+**Serialization** is implemented to save player progress, ensuring continuity across sessions.
+Our game comes with a preloaded trial player named 'byteme'. To access the preloaded game and explore the application features with this player, simply log in using the name 'byteme'
 
 The design heavily utilizes **Object-Oriented Programming (OOP)** principles such as **inheritance**,  **polymorphism**, **abstraction**, **encapsulation**. This is evident for instance in Bird, Pig, Obstacle classes etc.
 
@@ -85,6 +86,27 @@ The project also follows **Factory Design Pattern**, which helps manage the crea
      1. **Resume Game**: Resumes game with the progress you had made before pausing.
      2. **Save Game**: Saves the progress you have made during the game so it can be loaded using **Load Game** button from the **Homescreen** in the current or a future session.
      3. **Exit Game**: Ends the level and directs you back to the **Homescreen**.
+---
+
+## **How to Run the JUnit Tests**:
+
+1. Ensure you have **JUnit 5** and **Gradle** set up in your project.
+2. Navigate to your project root directory.
+3. Run the tests using the following Gradle command:
+
+   ```bash
+   ./gradlew test
+   ```
+
+4. View the test results in the terminal or the `build/reports/tests/test/index.html` file for a detailed report.
+
+### Notes
+
+- The tests use mock objects where applicable for dependencies.
+- These tests are written with simplicity to ensure they cover core logic scenarios.
+- checkOverlapTest: Validates the logic for detecting overlap between two rectangular areas using a custom isOverlapping method.
+- CollisionTest: Simulates collisions between Bird and Pig objects to verify correct collision detection.
+- TakeDamageTest: Tests the behavior of a simplified Pig class when it takes damage, including scenarios where the Pig is destroyed.
 
 *We sincerely hope you enjoy playing the game just as much as we enjoyed creating it!*
 
