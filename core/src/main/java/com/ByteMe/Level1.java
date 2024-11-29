@@ -450,10 +450,13 @@ public class Level1 extends Level implements Screen , InputProcessor {
                 }
 
                 if (obstacle.isDestroyed) {
+                    //find1
+                    //activeObstacles.remove(obstacle);
                     applyGravityDamage(obstacle.position.x, obstacle.position.y);
                 }
             }
         }
+        //activeBirds.remove(bird);
     }
 
     private void initializeOccupiedPositions() {
