@@ -74,22 +74,23 @@ public class Level1 extends Level implements Screen , InputProcessor {
             activePigs.addAll(pigs);
             activeObstacles.addAll(obstacles);
         }
-        else if (gameState == null){
+        else if (gameState == null){ //LOAD GAME
             birds.addAll(player.getLoadedGame().getLevel().activeBirds);
             obstacles.addAll(player.getLoadedGame().getLevel().activeObstacles);
             pigs.addAll(player.getLoadedGame().getLevel().activePigs);
             activeBirds.addAll(birds);
             activePigs.addAll(pigs);
             activeObstacles.addAll(obstacles);
-//
+            performCollisionCleanup(player.getLoadedGame().getLevel().birdsToRemove, player.getLoadedGame().getLevel().pigsToRemove, player.getLoadedGame().getLevel().obstaclesToRemove);
         }
-        else{
+        else{ //RESUME GAME
             birds.addAll(gameState.getLevel().activeBirds);
             obstacles.addAll(gameState.getLevel().activeObstacles);
             pigs.addAll(gameState.getLevel().activePigs);
             activeBirds.addAll(birds);
             activePigs.addAll(pigs);
             activeObstacles.addAll(obstacles);
+            performCollisionCleanup(gameState.getLevel().birdsToRemove, gameState.getLevel().pigsToRemove, gameState.getLevel().obstaclesToRemove);
         }
     }
 
@@ -737,8 +738,8 @@ public class Level1 extends Level implements Screen , InputProcessor {
 
     private void drawUI() {
         batch.draw(pauseButton, pauseButton_x, pauseButton_y, pauseButton_w, pauseButton_h);
-        batch.draw(winButton, winButton_x, winButton_y, winButton_w, winButton_h);
-        batch.draw(lossButton, lossButton_x, lossButton_y, lossButton_w, lossButton_h);
+//        batch.draw(winButton, winButton_x, winButton_y, winButton_w, winButton_h);
+//        batch.draw(lossButton, lossButton_x, lossButton_y, lossButton_w, lossButton_h);
     }
 
     private void handleInput() {
@@ -818,9 +819,9 @@ public class Level1 extends Level implements Screen , InputProcessor {
 //        List<Obstacle> activeObstacles = new ArrayList<>(obstacles);
 
         // Tracking lists for removal
-        List<Bird> birdsToRemove = new ArrayList<>();
-        List<Pig> pigsToRemove = new ArrayList<>();
-        List<Obstacle> obstaclesToRemove = new ArrayList<>();
+//        List<Bird> birdsToRemove = new ArrayList<>();
+//        List<Pig> pigsToRemove = new ArrayList<>();
+//        List<Obstacle> obstaclesToRemove = new ArrayList<>();
 
         // Process flying birds using an iterator for safe removal
         for (Bird bird : this.activeBirds) {

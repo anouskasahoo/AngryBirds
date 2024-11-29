@@ -79,11 +79,11 @@ public class LoadedGame extends Level implements Screen {
 //            } catch (IOException | ClassNotFoundException e) {
 //                System.err.println("Error loading game: " + e.getMessage());
 //            }
-            switch (gameState.getLevel().levelNumber){
-                case 1:
-                    game.setScreen(new Level1(game, player, true, null));
-                    break;
-            }
+//            switch (gameState.getLevel().levelNumber){
+//                case 1:
+//                    game.setScreen(new Level1(game, player, true, null));
+//                    break;
+//            }
         }
     }
 
@@ -167,9 +167,11 @@ public class LoadedGame extends Level implements Screen {
                 game.setScreen(new HomeScreen(game, player));
             }
             if (mouseX >= playButton_x && mouseX <= playButton_x+playButton_w && mouseY >= playButton_y && mouseY <= playButton_y+playButton_h){
-                game.setScreen(new LevelsScreen(game, player));
+                if (gameState == null) {
+                    game.setScreen(new LevelsScreen(game, player));
+                }
                 if (gameState!=null){
-                    game.setScreen(new Level1(game, player, true, null));
+                    game.setScreen(new Level1(game, player, true, null)); //ISSUE1: SWITCH CASE FOR ALL LEVELS
                 }
             }
 
