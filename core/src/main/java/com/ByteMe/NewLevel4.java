@@ -96,6 +96,7 @@ public class NewLevel4 extends Level implements Screen , InputProcessor {
             activeBirds.addAll(birds);
             activePigs.addAll(pigs);
             activeObstacles.addAll(obstacles);
+            performCollisionCleanup(player.getLoadedGame().getLevel().birdsToRemove, player.getLoadedGame().getLevel().pigsToRemove, player.getLoadedGame().getLevel().obstaclesToRemove);
 //
         }
         else{
@@ -105,6 +106,7 @@ public class NewLevel4 extends Level implements Screen , InputProcessor {
             activeBirds.addAll(birds);
             activePigs.addAll(pigs);
             activeObstacles.addAll(obstacles);
+            performCollisionCleanup(gameState.getLevel().birdsToRemove, gameState.getLevel().pigsToRemove, gameState.getLevel().obstaclesToRemove);
         }
     }
 
@@ -749,8 +751,8 @@ public class NewLevel4 extends Level implements Screen , InputProcessor {
 
     private void drawUI() {
         batch.draw(pauseButton, pauseButton_x, pauseButton_y, pauseButton_w, pauseButton_h);
-        batch.draw(winButton, winButton_x, winButton_y, winButton_w, winButton_h);
-        batch.draw(lossButton, lossButton_x, lossButton_y, lossButton_w, lossButton_h);
+//        batch.draw(winButton, winButton_x, winButton_y, winButton_w, winButton_h);
+//        batch.draw(lossButton, lossButton_x, lossButton_y, lossButton_w, lossButton_h);
     }
 
     private void handleInput() {

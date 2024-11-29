@@ -70,6 +70,9 @@ public abstract class Level implements Serializable {
     protected ArrayList<Bird> activeBirds;
     protected ArrayList<Pig> activePigs;
     protected ArrayList<Obstacle> activeObstacles;
+    List<Bird> birdsToRemove = new ArrayList<>();
+    List<Pig> pigsToRemove = new ArrayList<>();
+    List<Obstacle> obstaclesToRemove = new ArrayList<>();
 
     public Level(MainLauncher game, String t, int p1, int p2, int s1, int s2, Player player) {
         this.game = game;

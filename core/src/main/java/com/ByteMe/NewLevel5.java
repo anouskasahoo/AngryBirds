@@ -97,24 +97,10 @@ public class NewLevel5 extends Level implements Screen , InputProcessor {
             birds.addAll(player.getLoadedGame().getLevel().activeBirds);
             obstacles.addAll(player.getLoadedGame().getLevel().activeObstacles);
             pigs.addAll(player.getLoadedGame().getLevel().activePigs);
-
-//            try (FileInputStream fileIn = new FileInputStream("saved.ser");
-//                ObjectInputStream in = new ObjectInputStream(fileIn)) {
-//                GameState gameState = (GameState) in.readObject();
-//                player.setLoadedGame(gameState);
-//                System.out.println("Game state loaded from saved.ser");
-//                System.out.println(gameState.getLevel().levelNumber);
-//
-//            } catch (IOException | ClassNotFoundException e) {
-//                System.err.println("Error loading game: " + e.getMessage());
-//            }
-//            activeBirds = new ArrayList<>(birds);
-//            activePigs = new ArrayList<>(pigs);
-//            activeObstacles = new ArrayList<>(obstacles);
             activeBirds.addAll(birds);
             activePigs.addAll(pigs);
             activeObstacles.addAll(obstacles);
-//
+            performCollisionCleanup(player.getLoadedGame().getLevel().birdsToRemove, player.getLoadedGame().getLevel().pigsToRemove, player.getLoadedGame().getLevel().obstaclesToRemove);
         }
         else{
             birds.addAll(gameState.getLevel().activeBirds);
@@ -123,6 +109,7 @@ public class NewLevel5 extends Level implements Screen , InputProcessor {
             activeBirds.addAll(birds);
             activePigs.addAll(pigs);
             activeObstacles.addAll(obstacles);
+            performCollisionCleanup(gameState.getLevel().birdsToRemove, gameState.getLevel().pigsToRemove, gameState.getLevel().obstaclesToRemove);
         }
     }
 
@@ -767,8 +754,8 @@ public class NewLevel5 extends Level implements Screen , InputProcessor {
 
     private void drawUI() {
         batch.draw(pauseButton, pauseButton_x, pauseButton_y, pauseButton_w, pauseButton_h);
-        batch.draw(winButton, winButton_x, winButton_y, winButton_w, winButton_h);
-        batch.draw(lossButton, lossButton_x, lossButton_y, lossButton_w, lossButton_h);
+//        batch.draw(winButton, winButton_x, winButton_y, winButton_w, winButton_h);
+//        batch.draw(lossButton, lossButton_x, lossButton_y, lossButton_w, lossButton_h);
     }
 
     private void handleInput() {
