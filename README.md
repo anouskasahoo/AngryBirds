@@ -15,6 +15,17 @@ Players use iconic powered up Angry Birds characters to defeat villains in creat
 
 ---
 
+## Walkthrough
+
+Click below to watch the walkthrough
+
+
+<a href="https://youtu.be/cpYO8WvJYrk" target="_blank">
+  <img src="./assets/background.png" alt="Watch the demo" width="500"/>
+</a>
+
+---
+
 ## **Implementation Details**
 
 The game is developed using Java with a strong emphasis on **Object-Oriented Programming (OOP)** principles and incorporates several advanced techniques to create an engaging experience. The framework **libGDX** was utilized for handling textures, sprites, and rendering. Key game elements such as players, levels, obstacles, and characters are represented as classes to ensure modularity and scalability.
